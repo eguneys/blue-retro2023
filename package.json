@@ -14,10 +14,6 @@
     "build": "pnpm clean && tsc && vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
-    "blah": "link:..\\blah",
-    "lokey": "link:..\\lokey"
-  },
   "devDependencies": {
     "aset": "link:..\\aset",
     "chokidar": "^3.5.3",
