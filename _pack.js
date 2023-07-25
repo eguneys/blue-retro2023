@@ -40,9 +40,34 @@ export default async function pack() {
 
   fs.writeFileSync('./content/out_0.png', opt_png)
   fs.writeFileSync('./content/out_0.json', JSON.stringify(res))
+  fs.writeFileSync('./content/out_0.con', condensed(res))
 
   console.log('content written.')
 
+}
+
+function condensed(json) {
+  let { sprites } = json
+
+  return sprites.map(({
+    name,
+    tags,
+    packs
+  }) => {
+
+    let tt = tags.map(({
+      from, to, name
+    }) => [from, to, name].join('*')).join('\n')
+
+
+    let pp = packs.map(({
+      frame: { x, y, w, h },
+      packed: { x: px, y: py, w: pw, h: ph },
+      meta: { duration }
+    }) => [x,y,w,h,px,py,pw,ph,duration].join('*')).join('\n')
+
+    return [name, tt, pp].join('\n\n')
+  }).join('\n\n\n')
 }
 
 
