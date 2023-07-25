@@ -15,7 +15,7 @@ export default defineConfig({
         module: true,
         properties: {
           keep_quoted: 'strict',
-          reserved: []
+          reserved: ['make']
         }
       }
     },
