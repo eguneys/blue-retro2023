@@ -1,10 +1,13 @@
 import glsl from 'vite-plugin-glsl'
 import { defineConfig } from 'vite'
 import { visualizer } from 'rollup-plugin-visualizer'
+import viteImagemin from 'vite-plugin-imagemin'
 
 export default defineConfig({
   base: './',
-  plugins: [glsl()],
+  plugins: [glsl(), viteImagemin({
+    optipng: { optimizationLevel: 7 }
+  })],
   build: {
     minify: 'terser',
     terserOptions: {
