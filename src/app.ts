@@ -1,11 +1,11 @@
-import { Time } from './time'
+import Time from './time'
 
 type Config = {
   on_update: () => void,
   on_render: () => void
 }
 
-class _App {
+class App {
 
   app_time_last: number = 0
   app_time_accumulator: number = 0
@@ -25,7 +25,7 @@ class _App {
     }
 
     const step = (ticks_curr: number) => {
-      let ticks_diff = ticks_curr = this.app_time_last
+      let ticks_diff = ticks_curr - this.app_time_last
       this.app_time_last = ticks_curr
       this.app_time_accumulator += ticks_diff
 
@@ -51,4 +51,4 @@ class _App {
   }
 }
 
-export const App = new _App()
+export default new App()

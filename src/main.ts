@@ -1,4 +1,4 @@
-import { App } from './app'
+import App from './app'
 import Content from './content'
 import Graphics from './graphics'
 import Scene1 from './scene1'
@@ -17,6 +17,8 @@ function start(element: HTMLElement) {
       scene.draw(graphics)
     }
   })
+
+  element.appendChild(graphics.canvas)
 
 }
 

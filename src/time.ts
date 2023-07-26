@@ -2,7 +2,7 @@ const modf = (x: number, m: number) => {
   return x - Math.floor(x / m) * m
 }
 
-export class _Time {
+export class Time {
 
 
   ticks_per_second: number = 1000
@@ -42,4 +42,4 @@ export class _Time {
   }
 }
 
-export const Time = new _Time()
+export default new Time()
