@@ -7,3 +7,5 @@ declare module "*.con?raw" {
    const value: string;
    export = value;
 }
+
+declare module 'zzfx';

@@ -8,6 +8,9 @@ dependencies:
   vite-plugin-imagemin:
     specifier: ^0.6.1
     version: 0.6.1(vite@4.4.7)
+  zzfx:
+    specifier: ^1.2.0
+    version: 1.2.0
 
 devDependencies:
   aset:
@@ -3146,4 +3149,8 @@ packages:
     dependencies:
       buffer-crc32: 0.2.13
       fd-slicer: 1.1.0
+    dev: false
+
+  /zzfx@1.2.0:
+    resolution: {integrity: sha512-RtFz6PTMfCmxTfaCOv6GWAV4YaL/T0hltiMGkd87clybO8WLPlH6kX8sNkZGFKw9YPyu1UNsUYf/5/Vn4dondA==}
     dev: false
