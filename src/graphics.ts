@@ -1,3 +1,4 @@
+import Color from './color'
 import Content from './content'
 import { Anim } from './play'
 
@@ -18,6 +19,11 @@ export default class Graphics {
     this.ctx.imageSmoothingEnabled = false
   }
 
+  clear() {
+    let { ctx } = this
+    ctx.fillStyle = Color.background
+    ctx.fillRect(0, 0, 320, 180)
+  }
 
   anim(anim: Anim, x: number, y: number, scale_x = 1, scale_y = 1) {
     let {

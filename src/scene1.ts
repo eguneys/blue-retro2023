@@ -30,6 +30,7 @@ export default class Scene1 extends Play {
   _update() {
   }
 
-  _draw(g: Graphics) {
+  _pre_draw(g: Graphics) {
+    g.clear()
   }
 }

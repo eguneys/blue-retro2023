@@ -39,6 +39,7 @@ export default abstract class Play {
   }
 
   draw(graphics: Graphics) {
+    this._pre_draw(graphics)
     this.objects.forEach(_ => _.draw(graphics))
     this._draw(graphics)
   }
@@ -47,6 +48,7 @@ export default abstract class Play {
   _init() {}
   _update() {}
   _draw(graphics: Graphics) {}
+  _pre_draw(graphics: Graphics) {}
 }
 
 type AnimData = {
