@@ -31,9 +31,6 @@ devDependencies:
   rollup-plugin-sizes:
     specifier: ^1.0.5
     version: 1.0.5(rollup@3.26.3)
-  rollup-plugin-visualizer:
-    specifier: ^5.9.2
-    version: 5.9.2(rollup@3.26.3)
   terser:
     specifier: ^5.19.2
     version: 5.19.2
@@ -43,6 +40,9 @@ devDependencies:
   vite:
     specifier: ^4.4.7
     version: 4.4.7(terser@5.19.2)
+  vite-bundle-visualizer:
+    specifier: ^0.8.1
+    version: 0.8.1(rollup@3.26.3)
   vite-plugin-glsl:
     specifier: ^1.1.2
     version: 1.1.2(rollup@3.26.3)(vite@4.4.7)
@@ -568,6 +568,11 @@ packages:
       base64-js: 1.5.1
       ieee754: 1.2.1
     dev: false
+
+  /cac@6.7.14:
+    resolution: {integrity: sha512-b6Ilus+c3RrdDk+JhLKUAQfzzgLEPy6wcXqS7f/xe1EETvsDP6GORG7SFuOs6cID5YkqchW/LXZbX5bc8j7ZcQ==}
+    engines: {node: '>=8'}
+    dev: true
 
   /cacheable-request@2.1.4:
     resolution: {integrity: sha512-vag0O2LKZ/najSoUwDbVlnlCFvhBE/7mGTY2B5FgCBDcRD+oVV1HYTOwM6JZfMg/hIcM6IwnTZ1uQQL5/X3xIQ==}
@@ -3003,6 +3008,16 @@ packages:
       spdx-correct: 3.2.0
       spdx-expression-parse: 3.0.1
     dev: false
+
+  /vite-bundle-visualizer@0.8.1(rollup@3.26.3):
+    resolution: {integrity: sha512-CLNRfxjdVi6lMC0/FJCKqJ06LMvizGuoCJRHBPWcVHMhUZ04O3O4ACcaMoOjcJMaB8+QexfmaWKUcmyX3iOwOA==}
+    hasBin: true
+    dependencies:
+      cac: 6.7.14
+      rollup-plugin-visualizer: 5.9.2(rollup@3.26.3)
+    transitivePeerDependencies:
+      - rollup
+    dev: true
 
   /vite-plugin-glsl@1.1.2(rollup@3.26.3)(vite@4.4.7):
     resolution: {integrity: sha512-zmXsfc1vn2MlYve9t3FAoWuhLyoCkNS1TuQL+TkXZL7tGmBjRErp10eNYxcse5tK9oUC5MyJpNc4ElpQnx8DoA==}
