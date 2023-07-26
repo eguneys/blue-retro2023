@@ -13,8 +13,9 @@ export default defineConfig({
       mangle: {
         module: true,
         properties: {
+          debug: true,
           keep_quoted: 'strict',
-          reserved: ['make']
+          reserved: ['make', 'current_frame', '_current_frame']
         }
       }
     },

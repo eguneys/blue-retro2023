@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "clean": "rm -rf dist && rm -f dist.zip",
+    "clean": "rm -rf dist && rm -f dist.zip && rm build-analysis.html -f",
     "zip": "cd dist && zip -r ../dist.zip . -9 && cd .. && sh filesize.sh",
     "dist": "pnpm build && pnpm zip",
     "dev": "vite --port=3000",
