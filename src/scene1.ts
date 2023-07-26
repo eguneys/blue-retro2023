@@ -27,9 +27,6 @@ export default class Scene1 extends Play {
     this.make(StartScene1)
   }
 
-  _update() {
-  }
-
   _pre_draw(g: Graphics) {
     g.clear()
   }

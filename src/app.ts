@@ -7,7 +7,7 @@ type Config = {
 
 class App {
 
-  app_time_last: number = 0
+  app_time_last?: number
   app_time_accumulator: number = 0
 
   run(config: Config) {
@@ -25,7 +25,7 @@ class App {
     }
 
     const step = (ticks_curr: number) => {
-      let ticks_diff = ticks_curr - this.app_time_last
+      let ticks_diff = ticks_curr - (this.app_time_last ?? ticks_curr)
       this.app_time_last = ticks_curr
       this.app_time_accumulator += ticks_diff
 

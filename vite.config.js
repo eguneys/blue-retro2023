@@ -14,7 +14,7 @@ export default defineConfig({
         module: true,
         properties: {
           keep_quoted: 'strict',
-          reserved: ['make', 'current_frame', '_current_frame']
+          reserved: ['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed']
         }
       }
     },
