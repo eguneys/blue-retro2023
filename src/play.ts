@@ -119,6 +119,11 @@ export class Anim extends Play {
     let d_from_to = to - from
 
     this.__elapsed += Time.delta * 1000
+    /*
+    if (Time.delta > 0.017) {
+      console.log('delta', Time.delta)
+    }
+   */
 
     if (this.__elapsed >= duration) {
       this.__elapsed -= duration

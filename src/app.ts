@@ -25,7 +25,10 @@ class App {
     }
 
     const step = (ticks_curr: number) => {
-      let ticks_diff = ticks_curr - (this.app_time_last ?? ticks_curr)
+      let ticks_diff = Math.min(
+        25,
+        ticks_curr - (this.app_time_last ?? ticks_curr)
+      )
       this.app_time_last = ticks_curr
       this.app_time_accumulator += ticks_diff
 
