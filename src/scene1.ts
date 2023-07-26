@@ -1,6 +1,16 @@
 import Play, { Anim } from './play'
+import Input from './input'
 import Graphics from './graphics'
 import Sound from './sound'
+
+
+class StartScene1 extends Play {
+  _update() {
+    if (Input.btnp('jump')) {
+      Sound.fx('start')
+    }
+  }
+}
 
 export default class Scene1 extends Play {
   static make = () => {
@@ -14,7 +24,10 @@ export default class Scene1 extends Play {
     })
     anim.xy(0, 0)
 
-    Sound.fx('drum')
+    this.make(StartScene1)
+  }
+
+  _update() {
   }
 
   _draw(g: Graphics) {

@@ -3,7 +3,7 @@ import { ZZFX, zzfx } from 'zzfx'
 type ZZFxData = Array<number | undefined>
 
 let data = {
-  'drum': [,,129,.01,,.15,,,,,,,,5]
+  'start': [,,129,.01,,.15,,,,,,,,5]
 }
 
 class Sound {
@@ -19,7 +19,11 @@ class Sound {
   private _fxs!: Record<string, ZZFxData>
 
   fx(name: string) {
-    zzfx(...this._fxs[name])
+    let res = this._fxs[name]
+    if (!res) {
+      throw `nosound ${name}`
+    }
+    zzfx(...res)
   }
 }
 
