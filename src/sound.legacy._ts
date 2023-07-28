@@ -1,11 +1,9 @@
+import { ZZFX, zzfx } from 'zzfx'
+
+type ZZFxData = Array<number | undefined>
+
 let data = {
-
-}
-
-type FxData = string
-
-function fx(data: FxData) {
-  console.log(data)
+  'start': [,,129,.01,,.15,,,,,,,,5]
 }
 
 class Sound {
@@ -18,15 +16,15 @@ class Sound {
     return res
   }
 
-  private _fxs!: Record<string, FxData>
+  private _fxs!: Record<string, ZZFxData>
 
   fx(name: string) {
     let res = this._fxs[name]
     if (!res) {
       throw `nosound ${name}`
     }
-    fx(res)
+    zzfx(...res)
   }
 }
 
-export default new Sound()
+export default Sound.make()
