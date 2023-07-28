@@ -228,10 +228,11 @@ class Hud extends Play {
     this.make(SRectPlay, { color: Color.lightblue, x: 3, y: 2, w: 84, h: 42 })
     this.make(SRectPlay, { color: Color.red, x: 2, y: 1, w: 86, h: 44 })
 
+
     this.blue_text = 
       this.make(Text, { x: 50, y: 100, size: 74, text: 'blue' })
     this.retro_text = 
-      this.make(Text, { x: 50, y: 100, size: 74, text: 'retro' })
+      this.make(Text, { x: 150, y: 100, size: 74, text: 'retro' })
 
     this.align.push({
       margin: 89,
@@ -295,8 +296,12 @@ class StartScene1 extends Scene {
   _init() {
 
     this.make(RectPlay, { color: Color.darkblue, x: 0, y: 0, w: 320, h: 180 })
+
+    this.make(Text, { color: Color.lightblue, x: -250, y: 1020, size: 6000, text: 'V' })
+
     this.make(Text, { x: 50, y: 170, size: 112, text: '2 minute ssir..', color: Color.light })
-    this.make(Text, { x: 1920/2, y: 1080/2, size: 112, text: 'blue retro', color: Color.light })
+    this.make(Text, { x: 1920/2, y: 1080/2, size: 112, text: 'blue', color: Color.light })
+    this.make(Text, { x: 1920/2 + 320, y: 1080/2, size: 112, text: 'retro', color: Color.light })
     this.make(Text, { x: 1920/3, y: 900, size: 112, text: 'by', color: Color.light })
     this.make(CText, { x: 1920/3 + 200, y: 900, size: 112, text: 'eguneys', color: Color.light })
     this.begin_text1 = this.make(Text, { x: 1920*0.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })

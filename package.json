@@ -12,12 +12,13 @@
     "content": "node content.js",
     "lint": "tsc --noEmit --watch",
     "build": "pnpm clean && tsc && vite build && vite-bundle-visualizer",
-    "preview": "vite preview"
+    "preview": "vite preview --port=3000"
   },
   "devDependencies": {
     "aset": "link:..\\aset",
     "chokidar": "^3.5.3",
     "concurrently": "^8.2.0",
+    "http-server": "^14.1.1",
     "jspngopt": "^0.2.0",
     "roadroller": "^2.1.0",
     "rollup-plugin-sizes": "^1.0.5",
