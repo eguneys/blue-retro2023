@@ -9,11 +9,11 @@ export class Collider {
   }
 
   static hline = (x: number, y: number, w: number) => {
-    let h = cell_size
+    let h = 1
     return new Collider(x, y, w, h)
   }
   static vline = (x: number, y: number, h: number) => {
-    let w = cell_size
+    let w = 1
     return new Collider(x, y, w, h)
   }
 
@@ -27,8 +27,8 @@ export class Collider {
 }
 
 export const cell_size = 8
-export const grid_width = 320
-export const grid_height = 180
+export const grid_width = 40 // Math.ceil(320 / cell_size)
+export const grid_height = 23 // Math.ceil(180 / cell_size)
 
 export class GridCollider {
 
@@ -39,7 +39,7 @@ export class GridCollider {
     }
     let res = new GridCollider(grid)
 
-    res.add_collider(Collider.hline(0, grid_height - cell_size, grid_width))
+    res.add_collider(Collider.hline(0, 180 - cell_size, 320))
 
 
     return res
@@ -52,30 +52,35 @@ export class GridCollider {
 
     let x_start = Math.floor(collider.x / cell_size)
     let y_start = Math.floor(collider.y / cell_size)
-    let x_end = Math.floor((collider.x + collider.w) / cell_size)
-    let y_end = Math.floor((collider.y + collider.h) / cell_size)
+    let x_end = Math.floor((collider.x + collider.w - 1) / cell_size)
+    let y_end = Math.floor((collider.y + collider.h - 1) / cell_size)
 
-    for (let x = x_start; x < x_end; x++) {
-      for (let y = y_start; y < y_end; y++) {
+    for (let x = x_start; x <= x_end; x++) {
+      for (let y = y_start; y <= y_end; y++) {
         this.grid[x][y] = collider.value
       }
     }
   }
 
-  is_solid(x: number, y: number, w = cell_size, h = cell_size) {
+  is_solid(x: number, y: number, dx: number, dy: number) {
+    return this.is_solid_rect(x, y, dx, dy)
+  }
+
+  is_solid_rect(x: number, y: number, w = 1, h = 1) {
 
     let grid_x = Math.floor(x / cell_size)
     let grid_y = Math.floor(y / cell_size)
-    let grid_end_x = Math.floor((x + w) / cell_size)
-    let grid_end_y = Math.floor((y + h) / cell_size)
+    let grid_end_x = Math.floor((x + w - 1) / cell_size)
+    let grid_end_y = Math.floor((y + h - 1) / cell_size)
 
     if (grid_x < 0 || grid_end_x >= grid_width || grid_y < 0 || grid_end_y >= grid_height) {
       throw "outbounds"
     }
 
-    for (x = grid_x; x < grid_end_x; x++) {
-      for (y = grid_y; y < grid_end_y; y++) {
-        if (this.grid[grid_x][grid_y]) {
+    // overuse x y
+    for (x = grid_x; x <= grid_end_x; x++) {
+      for (y = grid_y; y <= grid_end_y; y++) {
+        if (this.grid[x][y]) {
           return true
         }
       }
@@ -85,6 +90,7 @@ export class GridCollider {
 }
 
 
+let d_colors = [Color.red, Color.darkred]
 export class PhCollider extends Play {
   grid!: GridCollider
 
@@ -93,10 +99,10 @@ export class PhCollider extends Play {
   }
 
   _draw(g: Graphics) {
-    for (let x = 0; x < grid_width; x+= cell_size) {
-      for (let y = 0; y < grid_height; y += cell_size) {
-        if (this.grid.is_solid(x, y)) {
-          g.rect(Color.red, x, y, cell_size, cell_size)
+    for (let x = 0; x < 320; x+= cell_size) {
+      for (let y = 0; y < 180; y += cell_size) {
+        if (this.grid.is_solid_rect(x, y)) {
+          g.srect(d_colors[(x + y) / cell_size % 2], x, y, cell_size, cell_size)
         }
       }
     }

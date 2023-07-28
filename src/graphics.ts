@@ -29,6 +29,13 @@ export default class Graphics {
     ctx.fillRect(x, y, w, h)
   }
 
+  srect(color = Color.red, x: number, y: number, w: number, h: number) {
+    let { ctx } = this
+    ctx.strokeStyle = color
+    ctx.lineWidth = 1
+    ctx.strokeRect(x + 1, y + 1, w - 2, h - 2)
+  }
+
   anim(anim: Anim, x: number, y: number, scale_x = 1, scale_y = 1) {
     let {
       sx, sy, sw, sh

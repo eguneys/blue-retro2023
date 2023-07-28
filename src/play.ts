@@ -51,7 +51,7 @@ export default abstract class Play {
   _pre_draw(graphics: Graphics) {}
 }
 
-type AnimData = {
+export type AnimData = {
   name: string,
   tag?: string
 }

@@ -1,4 +1,4 @@
-import Play, { Anim } from './play'
+import Play, { Anim, AnimData } from './play'
 import Input from './input'
 import Graphics from './graphics'
 import Sound from './sound'
@@ -19,12 +19,53 @@ abstract class LevelP extends Play {
     return this
   }
 
+
+  _update() {
+
+    let { grid } = this.solid
+    let { bodies } = this.world
+
+    // 2 pixel perfect collision detection
+    bodies.forEach(body => {
+
+      let dx = body.dx
+
+      for (let di = 0; di < dx; di+= 2) {
+        if (grid.is_solid(body.x, body.y, di, 0)) {
+          body.dx = 0
+          break
+        } else {
+          body.x += di
+        }
+      }
+
+      let dy = body.dy
+
+      for (let di = 0; di < dy; di+= 2) {
+        if (grid.is_solid(body.x, body.y, 0, di)) {
+          /*
+             console.log(body.x, body.y, di)
+             debugger
+             grid.is_solid(body.x, body.y, 0, di)
+          */
+          body.dy = 0
+          break
+        } else {
+          body.y += di
+        }
+      }
+    })
+
+
+  }
+
 }
 
 
 
 type PhBodyData = {
   x?: number,
+  y?: number,
   w: number,
   h: number
 }
@@ -38,13 +79,11 @@ abstract class PhBody extends Play {
   private _w!: number
   private _h!: number
 
-  private _x!: number
+  x!: number
+  y!: number
 
-  vx!: number
-
-  get x() {
-    return this._x
-  }
+  dx!: number
+  dy!: number
 
   get w() {
     return this._w
@@ -54,16 +93,19 @@ abstract class PhBody extends Play {
     return this._h
   }
 
-  _init() {
-    this._x = this.data.x ?? 0
+  init() {
+    this.x = this.data.x ?? 0
+    this.y = this.data.y ?? 0
 
     this._w = this.data.w
     this._h = this.data.h
 
-    this.vx = 0
+    this.dx = 0
+    this.dy = 0
+
+    return super.init()
   }
 }
-
 
 class PhWorld extends Play {
 
@@ -72,14 +114,39 @@ class PhWorld extends Play {
   }
 
   body<T extends PhBody>(ctor: { new (): T }, data: any = {}) {
-    this.make(ctor, data)
+    return this.make(ctor, data)
   }
 
   _update() {
   }
 }
 
-class Player extends PhBody {
+type PhBodyAnimData = AnimData & PhBodyData
+
+abstract class PhBodyAnim extends PhBody {
+
+  get data() {
+    return this._data as PhBodyAnimData
+  }
+
+  anim!: Anim
+
+  init() {
+
+    this.anim = this.make(Anim, this.data)
+
+    return super.init()
+  }
+
+  update() {
+    this.anim.x = this.x
+    this.anim.y = this.y
+
+    super.update()
+  }
+}
+
+class Player extends PhBodyAnim {
 }
 
 class StartScene1 extends Play {
@@ -101,12 +168,6 @@ export default class Scene1 extends Play {
   }
 
   _init() {
-
-    let anim = this.make(Anim, {
-      name: `player`
-    })
-    anim.xy(0, 0)
-
     this.make(StartScene1)
   }
 
@@ -118,7 +179,13 @@ export default class Scene1 extends Play {
 class Level1 extends LevelP {
 
   _init() {
-    this.world.body(Player)
+    let p1 = this.world.body(Player, {
+      name: `player`,
+      x: 0,
+      y: 0
+    })
+
+    //p1.dy = 4
   }
 
 }

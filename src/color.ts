@@ -1,4 +1,5 @@
 export default {
   background: '#735973',
-  red: '#de505a'
+  darkred: '#b42c73',
+  red: '#de505a',
 }
