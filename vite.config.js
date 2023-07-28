@@ -2,6 +2,18 @@ import glsl from 'vite-plugin-glsl'
 import { defineConfig } from 'vite'
 import viteImagemin from 'vite-plugin-imagemin'
 
+
+let colors = [
+  'background',
+  'darkblue',
+  'light',
+  'lightblue',
+  'red',
+  'darkred',
+  'green',
+  'purple'
+]
+
 export default defineConfig({
   base: './',
   plugins: [glsl(), viteImagemin({
@@ -15,7 +27,7 @@ export default defineConfig({
         properties: {
           //debug: true,
           keep_quoted: 'strict',
-          reserved: ['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline', 'seconds']
+          reserved: [...['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline', 'seconds', 'hex', 'css'], ...colors]
         }
       }
     },

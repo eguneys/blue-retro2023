@@ -8,6 +8,12 @@ import { PhCollider } from './collider'
 import { arr_rnd } from './random'
 import Mouse from './mouse'
 
+const l2h_x = (x: number) => x / 320 * 1920
+const l2h_y = (y: number) => y / 180 * 1080
+
+const rect_vs_point = (x: number, y: number, w: number, h: number, ax: number, ay: number) => {
+  return x <= ax && ax <= x + w && y <= ay && ay <= y + h
+}
 
 abstract class LevelP extends Play {
 
@@ -197,10 +203,122 @@ class RectPlay extends Play {
     return this._data as RectPlayData
   }
 
+
+  _lerp_to?: Color
+  _lerp_t = 0
+
+
+  lerp(c: Color, duration = 0.142) {
+    this._lerp_to = c
+    this._lerp_t = duration
+  }
+
+  _update() {
+    if (this._lerp_t > 0) {
+      let t = 1 - this._lerp_t / 0.2
+      this.data.color = Color.lerp(this.data.color, this._lerp_to!, t)
+
+      this._lerp_t -= Time.delta
+
+      if (this._lerp_t < 0) {
+        this._lerp_t = 0
+      }
+    }
+  }
+
   _draw(g: Graphics) {
     let { color, x, y, w, h } = this.data
 
     g.rect(color, x, y, w, h)
+  }
+}
+
+type ButtonData = {
+  x: number,
+  y: number,
+  text: string
+}
+
+class Button extends Play {
+
+  get data() {
+    return this._data as ButtonData
+  }
+
+  hovering = false
+  click_t = 0
+
+  readonly w = 60
+  readonly h = 22
+
+  get x() {
+    return this.data.x
+  }
+
+  get y() {
+    return this.data.y
+  }
+
+  bg!: RectPlay
+
+  _init() {
+
+    let { w, h } = this
+
+    this.bg = this.make(RectPlay, { color: Color.darkblue, x: 3, y: 2, w, h })
+    this.make(SRectPlay, { color: Color.lightblue, x: 3, y: 2, w, h })
+
+
+    this.make(Text, { x: l2h_x(w / 2 - 2), y: l2h_y(h / 2 + 2), size: 74, text: this.data.text, align: 'c' })
+  }
+
+  _update() {
+
+    if (this.click_t > 0) {
+      this.click_t -= Time.delta
+
+      if (this.click_t <= 0) {
+        this.click_t = 0
+
+        this.bg.lerp(Color.lightblue, 0.345)
+      }
+    }
+
+    if (Mouse.click) {
+      let [nx, ny] = Mouse.click
+
+      if (rect_vs_point(this.x, this.y, this.w, this.h, nx * 320, ny * 180)) {
+        this.click_t = 0.073454
+        this.bg.lerp(Color.red, this.click_t)
+      }
+
+    }
+    if (Mouse.move) {
+      let [nx, ny] = Mouse.move
+
+      if (rect_vs_point(this.x, this.y, this.w, this.h, nx * 320, ny * 180)) {
+
+        if (!this.hovering) {
+          this.hovering = true
+          this.bg.lerp(Color.lightblue)
+        }
+      } else {
+        if (this.hovering) {
+          this.bg.lerp(Color.darkblue)
+        }
+        this.hovering = false
+      }
+    }
+  }
+
+  _pre_draw(g: Graphics, t: Graphics) {
+    g.push_xy(this.data.x, this.data.y)
+    t.push_xy(l2h_x(this.data.x), l2h_y(this.data.y))
+  }
+
+  _draw(g: Graphics, t: Graphics) {
+    g.pop()
+    t.pop()
   }
 }
 
@@ -242,6 +360,10 @@ class Hud extends Play {
 
     this.make(Text, { x: 50, y: 170, size: 54, text: 'undescent' })
     this.make(Text, { x: 50, y: 228, size: 54, text: 'ipsum dolor' })
+
+    this.make(Button, { x: 250, y: 4, text: 'Right' })
+    this.make(Button, { x: 180, y: 4, text: 'Left' })
+    this.make(Button, { x: 220, y: 30, text: 'Jump' })
   }
 
   _update() {
@@ -290,7 +412,7 @@ class StartScene1 extends Scene {
   begin_text2!: Text
 
   _first_update() {
-    //this.switch_scene(GamePlayScene)
+    this.switch_scene(GamePlayScene)
   }
 
   _init() {
@@ -344,12 +466,15 @@ export default class Scene1 extends Scene {
   }
 }
 
+type TextAlign = 'c'
+
 type TextData = {
   x: number,
   y: number,
   size: number,
   color: Color,
-  text: string
+  text: string,
+  align?: TextAlign
 }
 
 
@@ -434,7 +559,7 @@ class Text extends Play {
   }
 
   _draw(_: Graphics, t: Graphics) {
-    this._width = t.str(this.text, this.x, this.y, this.size, this.color)
+    this._width = t.str(this.text, this.x, this.y, this.size, this.color, this.data.align)
   }
 }
 
@@ -449,8 +574,6 @@ class Level1 extends LevelP {
     })
 
     p1.dy = 4
-
-
   }
 
 }

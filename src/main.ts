@@ -13,6 +13,7 @@ function start(element: HTMLElement) {
 
   App.run({
     on_update() {
+      Mouse.update()
       Input.update()
       scene.update()
     },

@@ -2,6 +2,8 @@ import Color from './color'
 import Content from './content'
 import { Anim } from './play'
 
+export type TextAlign = 'c'
+
 export default class Graphics {
   static make = (width: number, height: number, pixelated = true) => {
 
@@ -40,6 +42,17 @@ export default class Graphics {
     ctx.clearRect(0, 0, this.width, this.height)
   }
 
+  push_xy(x: number, y: number) {
+    let { ctx } = this
+    ctx.save()
+    ctx.translate(x, y)
+  }
+
+  pop() {
+    let { ctx } = this
+    ctx.restore()
+  }
+
   rect(color = Color.red, x: number, y: number, w: number, h: number) {
     let { ctx } = this
     ctx.fillStyle = color.css
@@ -53,9 +66,16 @@ export default class Graphics {
     ctx.strokeRect(x + 1, y + 1, w - 2, h - 2)
   }
 
-  str(text: string, x: number, y: number, size = 64, color = Color.light) {
+  str(text: string, x: number, y: number, size = 64, color = Color.light, align?: TextAlign) {
     let { ctx } = this
     let width = ctx.measureText(text).width
+
+    if (align === 'c') {
+      x -= width / 2
+      ctx.textBaseline = 'middle'
+    } else {
+      ctx.textBaseline = 'alphabetic'
+    }
 
     ctx.font = `${size}px 'Courier New', monospace`
     ctx.fillStyle = color.css
