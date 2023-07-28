@@ -1,5 +1,23 @@
 # Blue Retro 2023
 
+An idle clicker game where you try to please the character playing a platformer game.
+
+
+## Usage
+
+do `pnpm install` first
+
+then
+
+- do `pnpm dist` for building into dist folder and bundling into dist.zip
+- do `pnpm dev` for starting vite development server, press o or visit localhost:3000 for page.
+- do `pnpm content` for watching and packing aseprite files into out_0.png and out_0.con then picked up from client code.
+- do `pnpm devc` for doing both.
+- do `pnpm lint` for watching typescript checks.
+
+aseprite files go into `assets/sprites` folder. `out_0.png` files built into `assets` folder.
+
+
 ## Interesting ChatGPT Conversations
 - [blending canvas 2d](https://chat.openai.com/share/9f0fbf85-231c-4c08-a912-4457e9c5f0b7)
 - [input handling 2d platformer](https://chat.openai.com/share/e35a861b-0d02-4f28-897f-d1afb5a6b95e)

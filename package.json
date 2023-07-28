@@ -25,10 +25,7 @@
     "typescript": "^5.1.6",
     "vite": "^4.4.7",
     "vite-bundle-visualizer": "^0.8.1",
-    "vite-plugin-glsl": "^1.1.2"
-  },
-  "dependencies": {
-    "vite-plugin-imagemin": "^0.6.1",
-    "zzfx": "^1.2.0"
+    "vite-plugin-glsl": "^1.1.2",
+    "vite-plugin-imagemin": "^0.6.1"
   }
 }
