@@ -13,8 +13,9 @@ export default defineConfig({
       mangle: {
         module: true,
         properties: {
+          //debug: true,
           keep_quoted: 'strict',
-          reserved: ['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed']
+          reserved: ['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline']
         }
       }
     },
