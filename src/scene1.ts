@@ -32,25 +32,27 @@ abstract class LevelP extends Play {
       let nb = 3
 
       for (let i = 0; i < nb; i++) {
-        let dx = body.dx
+        let dx = Math.abs(body.dx)
+        let sign = Math.sign(body.dx)
 
         for (let di = 1/nb; di <= dx; di+= 1/nb) {
-          if (grid.is_solid_xywh(body, di * Time.delta, 0)) {
+          if (grid.is_solid_xywh(body, sign * di * Time.delta, 0)) {
             body.dx = 0
             break
           } else {
-            body.x += di * Time.delta
+            body.x += sign * di * Time.delta
           }
         }
 
-        let dy = body.dy
+        let dy = Math.abs(body.dy)
+        sign = Math.sign(body.dy)
 
         for (let di = 1/nb; di <= dy; di+= 1/nb) {
-          if (grid.is_solid_xywh(body, 0, di * Time.delta)) {
+          if (grid.is_solid_xywh(body, 0, sign * di * Time.delta)) {
             body.dy = 0
             break
           } else {
-            body.y += di * Time.delta
+            body.y += sign * di * Time.delta
           }
         }
       }
@@ -145,6 +147,21 @@ abstract class PhBodyAnim extends PhBody {
 }
 
 class Player extends PhBodyAnim {
+
+  _update() {
+
+    if (Input.btn('left')) {
+      this.anim.scale_x = -1
+      this.dx = -3.6912
+    } else if (Input.btn('right')) {
+      this.anim.scale_x = 1
+      this.dx = 3.6912
+    } else {
+      this.dx = 0
+    }
+
+  }
+
 }
 
 class StartScene1 extends Play {

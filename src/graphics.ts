@@ -56,13 +56,29 @@ export default class Graphics {
        let { ctx } = this
        let { image } = Content
 
+       ctx.save()
+
        let sWidth = sw
        let sHeight = sh
 
-       let dWidth = sWidth * scale_x
-       let dHeight = sHeight * scale_y
+
+
+       let dWidth = sWidth * Math.abs(scale_x)
+       let dHeight = sHeight * Math.abs(scale_y)
+
+
+       ctx.scale(scale_x, scale_y)
+       if (scale_x < 0) {
+         dx *= -1
+         dx -= dWidth
+       }
+       if (scale_y < 0) {
+         dy *= -1
+         dy -= dHeight
+       }
 
        ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
 
+       ctx.restore()
   }
 }
