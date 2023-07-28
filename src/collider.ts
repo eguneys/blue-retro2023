@@ -30,6 +30,8 @@ export const cell_size = 8
 export const grid_width = 40 // Math.ceil(320 / cell_size)
 export const grid_height = 23 // Math.ceil(180 / cell_size)
 
+type XYWH = { x: number, y: number, w: number, h: number }
+
 export class GridCollider {
 
   static make = () => {
@@ -62,8 +64,10 @@ export class GridCollider {
     }
   }
 
-  is_solid(x: number, y: number, dx: number, dy: number) {
-    return this.is_solid_rect(x, y, dx, dy)
+  is_solid_xywh(xywh: XYWH, dx: number, dy: number) {
+    let { x, y, w, h } = xywh
+
+    return this.is_solid_rect(x + dx, y + dy, w, h)
   }
 
   is_solid_rect(x: number, y: number, w = 1, h = 1) {
@@ -74,7 +78,7 @@ export class GridCollider {
     let grid_end_y = Math.floor((y + h - 1) / cell_size)
 
     if (grid_x < 0 || grid_end_x >= grid_width || grid_y < 0 || grid_end_y >= grid_height) {
-      throw "outbounds"
+      throw `outbounds ${x} ${y}`
     }
 
     // overuse x y

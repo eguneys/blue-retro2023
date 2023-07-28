@@ -38,11 +38,13 @@ export default class Graphics {
 
   anim(anim: Anim, x: number, y: number, scale_x = 1, scale_y = 1) {
     let {
-      sx, sy, sw, sh
+      fx, fy, sx, sy, sw, sh
     } = anim.current_frame
 
-    let dx = x
-    let dy = y
+    let { origin_x, origin_y } = anim
+
+    let dx = x - fx - origin_x
+    let dy = y - fy - origin_y
 
     this.spr(dx, dy, sx, sy, sw, sh, scale_x, scale_y)
   }

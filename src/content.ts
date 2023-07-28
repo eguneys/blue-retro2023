@@ -21,8 +21,8 @@ function decon(con: string) {
     })
 
     let packs = _packs.split('\n').map(_ => {
-      let [x, y, w, h, sx, sy, sw, sh, duration] = _.split('*').map(_ => parseInt(_))
-      return { x, y, w, h, sx, sy, sw, sh, duration }
+      let [fx, fy, fw, fh, sx, sy, sw, sh] = _.split('*').map(_ => parseInt(_))
+      return { fx, fy, fw, fh, sx, sy, sw, sh, duration: 100 }
     })
 
     return {
@@ -40,10 +40,10 @@ type ContentTag = {
 }
 
 type ContentPack = {
-  x: number,
-  y: number,
-  w: number,
-  h: number,
+  fx: number,
+  fy: number,
+  fw: number,
+  fh: number,
   sx: number,
   sy: number,
   sw: number,

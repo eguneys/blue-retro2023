@@ -64,7 +64,7 @@ function condensed(json) {
       frame: { x, y, w, h },
       packed: { x: px, y: py, w: pw, h: ph },
       meta: { duration }
-    }) => [x,y,w,h,px,py,pw,ph,duration].join('*')).join('\n')
+    }) => [x,y,w,h,px,py,pw,ph].join('*')).join('\n')
 
     return [name, tt, pp].join('\n\n')
   }).join('\n\n\n')

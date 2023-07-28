@@ -51,9 +51,12 @@ export default abstract class Play {
   _pre_draw(graphics: Graphics) {}
 }
 
+export type SOrigin = 'c' | 'bc' | 'tl'
+
 export type AnimData = {
   name: string,
-  tag?: string
+  tag?: string,
+  s_origin?: SOrigin
 }
 
 export class Anim extends Play {
@@ -101,6 +104,37 @@ export class Anim extends Play {
   get current_frame() {
     let { from } = this.tag
     return this.info.packs[this._current_frame + from]
+  }
+
+  get s_origin() {
+    return this.data.s_origin ?? 'c'
+  }
+
+  get origin_x() {
+    if (this.s_origin === 'tl') {
+      return 0
+    }
+    let { fw } = this.current_frame
+
+    if (this.s_origin === 'c' || this.s_origin === 'bc') {
+      return fw / 2
+    }
+    return 0
+  }
+
+  get origin_y() {
+    if (this.s_origin === 'tl') {
+      return 0
+    }
+    let { fh } = this.current_frame
+
+    if (this.s_origin === 'c') {
+      return fh / 2
+    }
+    if (this.s_origin === 'bc') {
+      return fh
+    }
+    return 0
   }
 
   play_tag(tag: string) {

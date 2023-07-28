@@ -1,4 +1,5 @@
 import Play, { Anim, AnimData } from './play'
+import Time from './time'
 import Input from './input'
 import Graphics from './graphics'
 import Sound from './sound'
@@ -28,35 +29,32 @@ abstract class LevelP extends Play {
     // 2 pixel perfect collision detection
     bodies.forEach(body => {
 
-      let dx = body.dx
+      let nb = 3
 
-      for (let di = 0; di < dx; di+= 2) {
-        if (grid.is_solid(body.x, body.y, di, 0)) {
-          body.dx = 0
-          break
-        } else {
-          body.x += di
+      for (let i = 0; i < nb; i++) {
+        let dx = body.dx
+
+        for (let di = 1/nb; di <= dx; di+= 1/nb) {
+          if (grid.is_solid_xywh(body, di * Time.delta, 0)) {
+            body.dx = 0
+            break
+          } else {
+            body.x += di * Time.delta
+          }
         }
-      }
 
-      let dy = body.dy
+        let dy = body.dy
 
-      for (let di = 0; di < dy; di+= 2) {
-        if (grid.is_solid(body.x, body.y, 0, di)) {
-          /*
-             console.log(body.x, body.y, di)
-             debugger
-             grid.is_solid(body.x, body.y, 0, di)
-          */
-          body.dy = 0
-          break
-        } else {
-          body.y += di
+        for (let di = 1/nb; di <= dy; di+= 1/nb) {
+          if (grid.is_solid_xywh(body, 0, di * Time.delta)) {
+            body.dy = 0
+            break
+          } else {
+            body.y += di * Time.delta
+          }
         }
       }
     })
-
-
   }
 
 }
@@ -181,11 +179,12 @@ class Level1 extends LevelP {
   _init() {
     let p1 = this.world.body(Player, {
       name: `player`,
-      x: 0,
-      y: 0
+      x: 8,
+      y: 8,
+      s_origin: 'bc'
     })
 
-    //p1.dy = 4
+    p1.dy = 4
   }
 
 }
