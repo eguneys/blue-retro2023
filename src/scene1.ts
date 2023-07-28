@@ -175,7 +175,7 @@ type RectPlayData = {
   y: number,
   w: number,
   h: number,
-  color: string
+  color: Color
 }
 
 class SRectPlay extends Play {
@@ -348,7 +348,7 @@ type TextData = {
   x: number,
   y: number,
   size: number,
-  color: string,
+  color: Color,
   text: string
 }
 
@@ -374,9 +374,9 @@ class CText extends Play {
   y!: number
   size!: number
   text!: string
-  color!: string
+  color!: Color
 
-  lc!: [string, string][]
+  lc!: [string, Color][]
 
   _init() {
     this.text = this.data.text
@@ -423,7 +423,7 @@ class Text extends Play {
   y!: number
   size!: number
   text!: string
-  color!: string
+  color!: Color
 
   _init() {
     this.text = this.data.text

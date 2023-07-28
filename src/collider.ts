@@ -1,3 +1,4 @@
+import Time from './time'
 import Color from './color'
 import Play from './play'
 import Graphics from './graphics'
@@ -100,6 +101,12 @@ export class PhCollider extends Play {
 
   _init() {
     this.grid = GridCollider.make()
+  }
+
+  _update() {
+    if (Time.on_interval(0.86543)) {
+      [d_colors[1], d_colors[0]] = [d_colors[0], d_colors[1]]
+    }
   }
 
   _draw(g: Graphics) {

@@ -42,13 +42,13 @@ export default class Graphics {
 
   rect(color = Color.red, x: number, y: number, w: number, h: number) {
     let { ctx } = this
-    ctx.fillStyle = color
+    ctx.fillStyle = color.css
     ctx.fillRect(x, y, w, h)
   }
 
   srect(color = Color.red, x: number, y: number, w: number, h: number) {
     let { ctx } = this
-    ctx.strokeStyle = color
+    ctx.strokeStyle = color.css
     ctx.lineWidth = 1
     ctx.strokeRect(x + 1, y + 1, w - 2, h - 2)
   }
@@ -58,7 +58,7 @@ export default class Graphics {
     let width = ctx.measureText(text).width
 
     ctx.font = `${size}px 'Courier New', monospace`
-    ctx.fillStyle = color
+    ctx.fillStyle = color.css
     ctx.fillText(text, x, y)
     return width
   }
