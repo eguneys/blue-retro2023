@@ -1,4 +1,5 @@
 import App from './app'
+import Mouse from './mouse'
 import Input from './input'
 import Content from './content'
 import Graphics from './graphics'
@@ -23,6 +24,7 @@ function start(element: HTMLElement) {
   element.appendChild(graphics.canvas)
   element.appendChild(texts.canvas)
 
+  Mouse.listen(element)
 }
 
 async function app(element: HTMLElement) {

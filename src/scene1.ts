@@ -6,6 +6,7 @@ import Graphics from './graphics'
 import Sound from './sound'
 import { PhCollider } from './collider'
 import { arr_rnd } from './random'
+import Mouse from './mouse'
 
 
 abstract class LevelP extends Play {
@@ -316,7 +317,7 @@ class StartScene1 extends Scene {
 
 
 
-    if (Input.btnp('jump')) {
+    if (Mouse.click) {
       Sound.fx('start')
       this.switch_scene(GamePlayScene)
     }

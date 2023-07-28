@@ -17,7 +17,8 @@ export default class Graphics {
       ctx.imageSmoothingEnabled = pixelated
     }
 
-    document.addEventListener('resize', on_resize)
+    document.addEventListener('scroll', on_resize, { capture: true, passive: true })
+    window.addEventListener('resize', on_resize, { passive: true })
     on_resize()
  
     return new Graphics(canvas, ctx)
