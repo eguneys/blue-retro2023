@@ -5,6 +5,8 @@ import Input from './input'
 import Graphics from './graphics'
 import Sound from './sound'
 import { PhCollider } from './collider'
+import { arr_rnd } from './random'
+
 
 abstract class LevelP extends Play {
 
@@ -231,9 +233,13 @@ class Hud extends Play {
       this.make(Text, { x: 50, y: 100, size: 74, text: 'retro' })
 
     this.align.push({
-      margin: 33,
+      margin: 89,
       h: [this.blue_text, this.retro_text]
     })
+
+
+    this.make(Text, { x: 50, y: 170, size: 54, text: 'undescent' })
+    this.make(Text, { x: 50, y: 228, size: 54, text: 'ipsum dolor' })
   }
 
   _update() {
@@ -278,11 +284,38 @@ class GamePlayScene extends Scene {
 
 class StartScene1 extends Scene {
 
+  begin_text1!: Text
+  begin_text2!: Text
+
   _first_update() {
-    this.switch_scene(GamePlayScene)
+    //this.switch_scene(GamePlayScene)
+  }
+
+  _init() {
+
+    this.make(RectPlay, { color: Color.darkblue, x: 0, y: 0, w: 320, h: 180 })
+    this.make(Text, { x: 50, y: 170, size: 112, text: '2 minute ssir..', color: Color.light })
+    this.make(Text, { x: 1920/2, y: 1080/2, size: 112, text: 'blue retro', color: Color.light })
+    this.make(Text, { x: 1920/3, y: 900, size: 112, text: 'by', color: Color.light })
+    this.make(CText, { x: 1920/3 + 200, y: 900, size: 112, text: 'eguneys', color: Color.light })
+    this.begin_text1 = this.make(Text, { x: 1920*0.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })
+    this.begin_text2 = this.make(Text, { x: 1920*1.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })
   }
 
   _update() {
+
+    let dt = 300
+    this.begin_text1.x += dt * Time.delta
+    this.begin_text2.x += dt * Time.delta
+    if (this.begin_text1.x + this.begin_text1.width > 1920) {
+      this.begin_text2.x = this.begin_text1.x - 1920
+    }
+    if (this.begin_text2.x + this.begin_text2.width > 1920) {
+      this.begin_text1.x = this.begin_text2.x - 1920
+    }
+
+
+
     if (Input.btnp('jump')) {
       Sound.fx('start')
       this.switch_scene(GamePlayScene)
@@ -309,7 +342,59 @@ type TextData = {
   x: number,
   y: number,
   size: number,
+  color: string,
   text: string
+}
+
+
+
+class CText extends Play {
+
+  get data() {
+    return this._data as TextData
+  }
+
+  _width = 0
+
+  get width() {
+    return this._width
+  }
+
+  get height() {
+    return this.size
+  }
+
+  x!: number
+  y!: number
+  size!: number
+  text!: string
+  color!: string
+
+  lc!: [string, string][]
+
+  _init() {
+    this.text = this.data.text
+    this.x = this.data.x
+    this.y = this.data.y
+    this.size = this.data.size ?? 64
+    this.color = this.data.color ?? Color.light
+
+    this.lc = []
+  }
+
+  _update() {
+    if (Time.on_interval(0.2)) {
+      this.lc = this.text.split('').map(_ => [_, arr_rnd(Color.all)])
+    }
+  }
+
+  _draw(_: Graphics, t: Graphics) {
+    this._width = 0
+    this.lc.map(([letter, color]) => {
+      let w = t.str(letter, this.x + this._width, this.y, this.size, color)
+      this._width += w
+    })
+  }
 }
 
 class Text extends Play {
@@ -332,16 +417,18 @@ class Text extends Play {
   y!: number
   size!: number
   text!: string
+  color!: string
 
   _init() {
     this.text = this.data.text
     this.x = this.data.x
     this.y = this.data.y
     this.size = this.data.size ?? 64
+    this.color = this.data.color ?? Color.light
   }
 
   _draw(_: Graphics, t: Graphics) {
-    this._width = t.str(this.text, this.x, this.y, this.size)
+    this._width = t.str(this.text, this.x, this.y, this.size, this.color)
   }
 }
 

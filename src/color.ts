@@ -1,8 +1,29 @@
+const lightblue = '#4181bd'
+const background = '#b4aec5'
+const light = '#eeeaf6'
+const  darkblue = '#183452'
+const darkred = '#b42c73'
+const red = '#de505a'
+const green = '#20eea4'
+const purple = '#8b81b4'
+
 export default {
-  lightblue: '#4181bd',
-  background: '#b4aec5',
-  light: '#eeeaf6',
-  darkblue: '#183452',
-  darkred: '#b42c73',
-  red: '#de505a',
+  lightblue,
+  background,
+  light,
+  darkblue,
+  darkred,
+  red,
+  green,
+  purple,
+  all: [
+    background,
+    darkblue,
+    light,
+    lightblue,
+    red,
+    darkred,
+    green,
+    purple
+  ]
 }
