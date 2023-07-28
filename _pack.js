@@ -4,7 +4,7 @@ import jspngopt from 'jspngopt'
 
 export default async function pack() {
 
-  let packer = new Packer(4)
+  let packer = new Packer(0)
 
   let sprites = []
 

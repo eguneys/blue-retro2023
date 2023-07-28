@@ -15,7 +15,7 @@ export default defineConfig({
         properties: {
           //debug: true,
           keep_quoted: 'strict',
-          reserved: ['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline']
+          reserved: ['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline', 'seconds']
         }
       }
     },
