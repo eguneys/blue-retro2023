@@ -2,15 +2,17 @@ import Play, { Anim } from './play'
 import Input from './input'
 import Graphics from './graphics'
 import Sound from './sound'
-
+import { PhCollider } from './collider'
 
 abstract class LevelP extends Play {
 
   world!: PhWorld
+  solid!: PhCollider
 
   init() {
 
     this.world = this.make(PhWorld)
+    this.solid = this.make(PhCollider)
 
     this._init()
 

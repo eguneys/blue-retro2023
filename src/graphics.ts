@@ -19,10 +19,14 @@ export default class Graphics {
     this.ctx.imageSmoothingEnabled = false
   }
 
-  clear() {
+  clear(color = Color.background) {
+    this.rect(color, 0, 0, 320, 180)
+  }
+
+  rect(color = Color.red, x: number, y: number, w: number, h: number) {
     let { ctx } = this
-    ctx.fillStyle = Color.background
-    ctx.fillRect(0, 0, 320, 180)
+    ctx.fillStyle = color
+    ctx.fillRect(x, y, w, h)
   }
 
   anim(anim: Anim, x: number, y: number, scale_x = 1, scale_y = 1) {

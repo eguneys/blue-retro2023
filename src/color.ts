@@ -1,3 +1,4 @@
 export default {
-  background: '#735973'
+  background: '#735973',
+  red: '#de505a'
 }
