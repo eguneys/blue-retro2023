@@ -6,3 +6,4 @@
 - [audio synthesis from infernal throne previous js13k entry](https://chat.openai.com/share/957a3f2c-2d05-4ed2-885c-3c8af7c7caf9) [releated issue](https://github.com/arikwex/infernal-sigil/issues/2)
 - [xpbd research paper](https://chat.openai.com/share/ca063af5-3bc5-4b23-98f1-ffa385a3d7bd)
 - [grid collider in celeste](https://chat.openai.com/share/8acb4217-a7c8-4d0f-b195-976dff67661c)
+- [320x180 draw text](https://chat.openai.com/share/5a07abdb-a8d7-446e-80c4-7adea4badd7f)
