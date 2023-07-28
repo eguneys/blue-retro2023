@@ -4,7 +4,88 @@ import Graphics from './graphics'
 import Sound from './sound'
 
 
+abstract class LevelP extends Play {
+
+  world!: PhWorld
+
+  init() {
+
+    this.world = this.make(PhWorld)
+
+    this._init()
+
+    return this
+  }
+
+}
+
+
+
+type PhBodyData = {
+  x?: number,
+  w: number,
+  h: number
+}
+
+abstract class PhBody extends Play {
+
+  get data() {
+    return this._data as PhBodyData
+  }
+
+  private _w!: number
+  private _h!: number
+
+  private _x!: number
+
+  vx!: number
+
+  get x() {
+    return this._x
+  }
+
+  get w() {
+    return this._w
+  }
+
+  get h() {
+    return this._h
+  }
+
+  _init() {
+    this._x = this.data.x ?? 0
+
+    this._w = this.data.w
+    this._h = this.data.h
+
+    this.vx = 0
+  }
+}
+
+
+class PhWorld extends Play {
+
+  get bodies() {
+    return this.objects as PhBody[]
+  }
+
+  body<T extends PhBody>(ctor: { new (): T }, data: any = {}) {
+    this.make(ctor, data)
+  }
+
+  _update() {
+  }
+}
+
+class Player extends PhBody {
+}
+
 class StartScene1 extends Play {
+
+  _init() {
+    this.make(Level1)
+  }
+
   _update() {
     if (Input.btnp('jump')) {
       Sound.fx('start')
@@ -31,3 +112,13 @@ export default class Scene1 extends Play {
     g.clear()
   }
 }
+
+class Level1 extends LevelP {
+
+  _init() {
+    this.world.body(Player)
+  }
+
+}
+
+
