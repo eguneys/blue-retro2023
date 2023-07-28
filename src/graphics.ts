@@ -102,7 +102,7 @@ export default class Graphics {
          dy -= dHeight
        }
 
-       ctx.drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+       ctx.drawImage(image, sx, sy, sWidth, sHeight, Math.round(dx), Math.round(dy), dWidth, dHeight)
 
        ctx.restore()
   }
