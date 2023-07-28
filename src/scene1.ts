@@ -412,7 +412,7 @@ class StartScene1 extends Scene {
   begin_text2!: Text
 
   _first_update() {
-    this.switch_scene(GamePlayScene)
+    //this.switch_scene(GamePlayScene)
   }
 
   _init() {

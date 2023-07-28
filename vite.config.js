@@ -27,7 +27,7 @@ export default defineConfig({
         properties: {
           //debug: true,
           keep_quoted: 'strict',
-          reserved: [...['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline', 'seconds', 'hex', 'css'], ...colors]
+          reserved: [...['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline', 'seconds', 'hex', 'css', 'h', 'lerp'], ...colors]
         }
       }
     },
