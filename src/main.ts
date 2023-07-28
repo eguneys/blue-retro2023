@@ -6,7 +6,8 @@ import Scene1 from './scene1'
 
 function start(element: HTMLElement) {
 
-  let graphics = Graphics.make()
+  let texts = Graphics.make(1920, 1080, false)
+  let graphics = Graphics.make(320, 180)
   let scene = Scene1.make()
 
   App.run({
@@ -15,11 +16,12 @@ function start(element: HTMLElement) {
       scene.update()
     },
     on_render() {
-      scene.draw(graphics)
+      scene.draw(graphics, texts)
     }
   })
 
   element.appendChild(graphics.canvas)
+  element.appendChild(texts.canvas)
 
 }
 

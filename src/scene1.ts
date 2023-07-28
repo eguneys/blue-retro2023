@@ -146,16 +146,18 @@ abstract class PhBodyAnim extends PhBody {
   }
 }
 
+const max_dx = 3.6912
+
 class Player extends PhBodyAnim {
 
   _update() {
 
     if (Input.btn('left')) {
       this.anim.scale_x = -1
-      this.dx = -3.6912
+      this.dx = -max_dx
     } else if (Input.btn('right')) {
       this.anim.scale_x = 1
-      this.dx = 3.6912
+      this.dx = max_dx
     } else {
       this.dx = 0
     }
@@ -186,8 +188,16 @@ export default class Scene1 extends Play {
     this.make(StartScene1)
   }
 
-  _pre_draw(g: Graphics) {
+  _pre_draw(g: Graphics, t: Graphics) {
     g.clear()
+    t.clear()
+  }
+}
+
+class Text extends Play {
+  _draw(_: Graphics, t: Graphics) {
+
+    t.str('hello', 100, 50, 100)
   }
 }
 
@@ -202,6 +212,9 @@ class Level1 extends LevelP {
     })
 
     p1.dy = 4
+
+
+    this.make(Text)
   }
 
 }

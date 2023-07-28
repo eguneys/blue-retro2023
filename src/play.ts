@@ -38,17 +38,17 @@ export default abstract class Play {
     this._update()
   }
 
-  draw(graphics: Graphics) {
-    this._pre_draw(graphics)
-    this.objects.forEach(_ => _.draw(graphics))
-    this._draw(graphics)
+  draw(graphics: Graphics, texts: Graphics) {
+    this._pre_draw(graphics, texts)
+    this.objects.forEach(_ => _.draw(graphics, texts))
+    this._draw(graphics, texts)
   }
 
 
   _init() {}
   _update() {}
-  _draw(graphics: Graphics) {}
-  _pre_draw(graphics: Graphics) {}
+  _draw(graphics: Graphics, texts: Graphics) {}
+  _pre_draw(graphics: Graphics, texts: Graphics) {}
 }
 
 export type SOrigin = 'c' | 'bc' | 'tl'
@@ -171,7 +171,7 @@ export class Anim extends Play {
 
   }
 
-  _draw(graphics: Graphics) {
+  _draw(graphics: Graphics, texts: Graphics) {
     let { x, y, scale_x, scale_y } = this
 
     graphics.anim(this, x, y, scale_x, scale_y)

@@ -3,24 +3,40 @@ import Content from './content'
 import { Anim } from './play'
 
 export default class Graphics {
-  static make = () => {
+  static make = (width: number, height: number, pixelated = true) => {
 
     let canvas = document.createElement('canvas')
-    canvas.width = 320
-    canvas.height = 180
+    if (pixelated) {
+      canvas.classList.add('pixelated')
+    }
 
-    return new Graphics(canvas)
+    let ctx = canvas.getContext('2d')!
+    const on_resize = () => {
+      canvas.width = width
+      canvas.height = height
+      ctx.imageSmoothingEnabled = pixelated
+    }
+
+    document.addEventListener('resize', on_resize)
+    on_resize()
+ 
+    return new Graphics(canvas, ctx)
   }
 
-  ctx: CanvasRenderingContext2D
-
-  constructor(readonly canvas: HTMLCanvasElement) {
-    this.ctx = canvas.getContext('2d')!
-    this.ctx.imageSmoothingEnabled = false
+  get width() {
+    return this.canvas.width
   }
+
+  get height() {
+    return this.canvas.height
+  }
+
+  constructor(readonly canvas: HTMLCanvasElement, 
+              readonly ctx: CanvasRenderingContext2D) {}
 
   clear(color = Color.background) {
-    this.rect(color, 0, 0, 320, 180)
+    let { ctx } = this
+    ctx.clearRect(0, 0, this.width, this.height)
   }
 
   rect(color = Color.red, x: number, y: number, w: number, h: number) {
@@ -34,6 +50,15 @@ export default class Graphics {
     ctx.strokeStyle = color
     ctx.lineWidth = 1
     ctx.strokeRect(x + 1, y + 1, w - 2, h - 2)
+  }
+
+  str(text: string, x: number, y: number, size = 64, color = Color.light) {
+    let { ctx } = this
+    let width = ctx.measureText(text).width
+
+    ctx.font = `${size}px 'Courier New', monospace`
+    ctx.fillStyle = color
+    ctx.fillText(text, x, y)
   }
 
   anim(anim: Anim, x: number, y: number, scale_x = 1, scale_y = 1) {
