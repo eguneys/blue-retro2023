@@ -59,6 +59,7 @@ export default class Graphics {
     ctx.font = `${size}px 'Courier New', monospace`
     ctx.fillStyle = color
     ctx.fillText(text, x, y)
+    return width
   }
 
   anim(anim: Anim, x: number, y: number, scale_x = 1, scale_y = 1) {

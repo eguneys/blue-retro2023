@@ -11,6 +11,7 @@ export default abstract class Play {
     return this
   }
 
+  life!: number
   objects: Play[]
 
   constructor() {
@@ -28,13 +29,28 @@ export default abstract class Play {
     return res
   }
 
+  remove(p: Play) {
+    let i = this.objects.indexOf(p)
+    if (i === -1) {
+      throw 'noscene rm'
+    }
+    this.objects.splice(i, 1)
+  }
+
   init() {
+
+    this.life = 0
+
     this._init()
     return this
   }
 
   update() {
+    if (this.life === 0) {
+      this._first_update()
+    }
     this.objects.forEach(_ => _.update())
+    this.life += Time.delta
     this._update()
   }
 
@@ -46,6 +62,7 @@ export default abstract class Play {
 
 
   _init() {}
+  _first_update() {}
   _update() {}
   _draw(graphics: Graphics, texts: Graphics) {}
   _pre_draw(graphics: Graphics, texts: Graphics) {}

@@ -1,7 +1,8 @@
 export default {
-  background: '#735973',
+  lightblue: '#4181bd',
+  background: '#b4aec5',
   light: '#eeeaf6',
-  dark: '#183452',
+  darkblue: '#183452',
   darkred: '#b42c73',
   red: '#de505a',
 }
