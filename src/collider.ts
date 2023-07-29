@@ -6,7 +6,7 @@ import { rnd_int } from './random'
 
 const sum = (a: number[]) => a.reduce((a, b) => a + b, 0)
 
-const tile_size = 8
+const tile_size = 16
 
 class Tile {
 
@@ -39,28 +39,16 @@ class Tile {
               readonly solid: boolean) {}
 }
 
-const split_w = (w: number) => {
-  let res = []
-  while (w >= 8) {
-    let n = 8 + rnd_int(Math.min(rnd_int(rnd_int(32)), w - 8))
-    res.push(n)
-    w -= n
-  }
-  console.log(sum(res))
-  return res
-}
-
 export class Collider {
 
   static hlines = (x: number, y: number, w: number) => {
     let h = 1
     return [
-      ...split_w(w - 16).reduce((acc, w) => [
-        new Collider(acc[0].x + acc[0].w, y, w, h, 
-                     Tile.make('sun', 1, 4, 0, 0, true)), ...acc], [
-        new Collider(x, y, 8, h, Tile.make('sun', 0, 0, 0, 0, true)),
-      ]),
-      new Collider(x+w-8, y, 8, h, Tile.make('sun', 5, 5, 0, 0, true))
+      new Collider(x, y, tile_size, h, Tile.make('sun', 0, 0, 0, 0, true)),
+      ...[...Array((w-tile_size)/tile_size).keys()].map(i =>
+        new Collider(x + tile_size * (i+1), y, tile_size, h, 
+                     Tile.make('sun', 1, 4, 0, 0, true))),
+      new Collider(x+w-tile_size, y, tile_size, h, Tile.make('sun', 5, 5, 0, 0, true))
     ]
   }
 
@@ -73,7 +61,7 @@ export class Collider {
 
 }
 
-export const cell_size = 8
+export const cell_size = 16
 export const grid_width = 40 // Math.ceil(320 / cell_size)
 export const grid_height = 23 // Math.ceil(180 / cell_size)
 
@@ -88,10 +76,9 @@ export class GridCollider {
     }
     let res = new GridCollider(grid)
 
-    Collider.hlines(0, 180 - cell_size, 320)
+    Collider.platform(0, 180 - cell_size, 320)
     .forEach(cld => res.add_collider(cld))
 
-    console.log('here',Collider.hlines(0, 180 - cell_size, 320).map(_ => _.x))
 
     return res
   }

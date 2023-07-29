@@ -471,6 +471,7 @@ class CreditsScene extends Scene {
 
     this.texts = [
       this.make(Text, { color: Color.darkpurple, x, y: 100, size: 90, text: 'thanks for playing' }),
+      this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'art twitter.com/_V3X3D' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'music github.com/arikwex' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'author twitter.com/eguneys' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 120, text: 'Mucho Gracias <3' }),

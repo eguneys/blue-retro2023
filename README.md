@@ -2,6 +2,14 @@
 
 An idle clicker game where you try to please the character playing a platformer game.
 
+Character will give you clues to what it wants, you try to adjust the level design to it's needs to gain points.
+
+There may or may not be a secret code which you can tweet me so I know you actually finished the game.
+
+You play with mouse, no touch controls are enabled. You can also use arrow keys or wasd to actually control the player.
+
+Have a Happy day.
+
 ## Tips
 
 Use magic ratios like these to increase juice `0.86543` instead of dry numbers like `0.7`.
@@ -23,6 +31,7 @@ aseprite files go into `assets/sprites` folder. `out_0.png` files built into `as
 
 
 ## Interesting ChatGPT Conversations
+- [have a happy day too](https://chat.openai.com/share/9e8b39b4-23fb-41f6-82c7-5b3c42c09dcb)
 - [normal numbers](https://chat.openai.com/share/fdf4ffef-13ac-4e6c-9ba6-4d3915e7184d)
 - [blending canvas 2d](https://chat.openai.com/share/9f0fbf85-231c-4c08-a912-4457e9c5f0b7)
 - [input handling 2d platformer](https://chat.openai.com/share/e35a861b-0d02-4f28-897f-d1afb5a6b95e)
