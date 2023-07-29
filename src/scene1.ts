@@ -518,10 +518,15 @@ class StartScene1 extends Scene {
     this.make(Text, { x: 1920/2 + 320, y: 1080/2, size: 112, text: 'retro', color: Color.light })
     this.make(Text, { x: 1920/3, y: 900, size: 112, text: 'by', color: Color.light })
     this.make(CText, { x: 1920/3 + 200, y: 900, size: 112, text: 'eguneys', color: Color.light })
-    this.begin_text1 = this.make(Text, { x: 1920*0.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })
-    this.begin_text2 = this.make(Text, { x: 1920*1.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })
+    this.begin_text1 = this.make(Text, { x: 0, y: 1030, size: 62, text: 'click to begin', color: Color.light })
+    this.begin_text2 = this.make(Text, { x: 0, y: 1030, size: 62, text: 'click to begin', color: Color.light })
 
-    Sound.load(p => { console.log(`lsnd ${p}`) })
+    Sound.load(p => { 
+      let text = p === 1 ? `click to begin` : `loading sounds ${p * 100}%`
+      this.begin_text1.text = text
+      this.begin_text2.text = text
+      console.log(text)
+    })
 
     let self = this
     this.add_mouse(0, 0, 320, 180, {

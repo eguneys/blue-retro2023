@@ -8,10 +8,13 @@ let colors = [
   'darkblue',
   'light',
   'lightblue',
+  'darkblue',
   'red',
   'darkred',
   'green',
-  'purple'
+  'purple',
+  'darkpurple',
+  'lightpurple'
 ]
 
 export default defineConfig({

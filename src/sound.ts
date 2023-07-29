@@ -117,7 +117,7 @@ const make_fx = async (on_progress: (_: number) => void) => {
     for (let i in songs) {
       let [name, melody, seed] = songs[i]
       let res = await genericSongBuilder(melody, seed);
-      setProgress((Number(i) + 1) / total)
+      setProgress((sounds.length + (Number(i) + 1)) / total)
 
       musicRegionBuffers[name] = res
     }
