@@ -558,7 +558,8 @@ export default class Scene1 extends Scene {
   }
 
   _init() {
-    this.add_scene(StartScene1)
+    //this.add_scene(StartScene1)
+    this.add_scene(GamePlayScene)
   }
 
   _pre_draw(g: Graphics, t: Graphics) {

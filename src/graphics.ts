@@ -97,8 +97,8 @@ export default class Graphics {
   }
 
 
-  private spr(dx: number, dy: number, sx: number, sy: number, sw: number, sh: number,
-     scale_x: number, scale_y: number) {
+  spr(dx: number, dy: number, sx: number, sy: number, sw: number, sh: number,
+     scale_x: number = 1, scale_y: number = 1) {
 
        let { ctx } = this
        let { image } = Content
