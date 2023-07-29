@@ -23,6 +23,7 @@ aseprite files go into `assets/sprites` folder. `out_0.png` files built into `as
 
 
 ## Interesting ChatGPT Conversations
+- [normal numbers](https://chat.openai.com/share/fdf4ffef-13ac-4e6c-9ba6-4d3915e7184d)
 - [blending canvas 2d](https://chat.openai.com/share/9f0fbf85-231c-4c08-a912-4457e9c5f0b7)
 - [input handling 2d platformer](https://chat.openai.com/share/e35a861b-0d02-4f28-897f-d1afb5a6b95e)
 - [audio synthesis from infernal throne previous js13k entry](https://chat.openai.com/share/957a3f2c-2d05-4ed2-885c-3c8af7c7caf9) [releated issue](https://github.com/arikwex/infernal-sigil/issues/2)
