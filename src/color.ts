@@ -6,6 +6,7 @@ export default class Color {
   (rgb & 0x0000ff),
   255)
 
+  static lightpurple = Color.hex(0xb4aec5)
   static lightblue = Color.hex(0x4181bd)
   static background = Color.hex(0xb4aec5)
   static light = Color.hex(0xeeeaf6)
@@ -14,6 +15,7 @@ export default class Color {
   static red = Color.hex(0xde505a)
   static green = Color.hex(0x20eea4)
   static purple = Color.hex(0x8b81b4)
+  static darkpurple = Color.hex(0x735973)
 
 
 

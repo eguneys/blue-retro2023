@@ -7,7 +7,6 @@ import Sound from './sound'
 import { PhCollider } from './collider'
 import { arr_rnd } from './random'
 import { rect_vs_point } from './rect'
-import Mouse from './mouse'
 
 const l2h_x = (x: number) => x / 320 * 1920
 const l2h_y = (y: number) => y / 180 * 1080
@@ -323,7 +322,15 @@ type Align = {
   v?: PosPlay[]
 }
 
+type HudData = {
+  on_credits: () => void
+}
+
 class Hud extends Play {
+
+  get data() {
+    return this._data as HudData
+  }
 
   align!: Align[]
 
@@ -348,6 +355,21 @@ class Hud extends Play {
     this.retro_text = 
       this.make(Text, { x: 150, y: 100, size: 74, text: 'retro' })
 
+    let self = this
+    this.add_mouse(h2l_x(50), h2l_y(100 - 74), h2l_x(500), h2l_y(74), {
+      on_click() {
+        self.data.on_credits()
+      },
+      on_hover_begin() {
+        self.blue_text.color = Color.lightblue
+        self.retro_text.color = Color.purple
+      },
+      on_hover_end() {
+        self.blue_text.color = Color.light
+        self.retro_text.color = Color.light
+      }
+    })
+
     this.align.push({
       margin: 89,
       h: [this.blue_text, this.retro_text]
@@ -358,15 +380,10 @@ class Hud extends Play {
     this.music_text = this.make(Text, { x: 50, y: 228, size: 54, text: 'music' })
     this.music_ontext = this.make(Text, { x: 280, y: 228, size: 54, text: 'on' })
 
-    let self = this
     this.add_mouse(h2l_x(50), h2l_y(228-54), h2l_x(280), h2l_y(54), {
       on_click() {
         Sound.music_onoff = !Sound.music_onoff
-        if (Sound.music_onoff) {
-          self.music_ontext.text = 'on'
-        } else {
-          self.music_ontext.text = 'off'
-        }
+        self.update_sound_text()
       },
       on_hover_begin() {
         self.music_ontext.color = Color.red
@@ -379,6 +396,16 @@ class Hud extends Play {
     this.make(Button, { x: 250, y: 4, text: 'Right' })
     this.make(Button, { x: 180, y: 4, text: 'Left' })
     this.make(Button, { x: 220, y: 30, text: 'Jump' })
+
+    self.update_sound_text()
+  }
+
+  update_sound_text() {
+    if (Sound.music_onoff) {
+      this.music_ontext.text = 'on'
+    } else {
+      this.music_ontext.text = 'off'
+    }
   }
 
   _update() {
@@ -416,9 +443,57 @@ abstract class Scene extends Play {
 
 class GamePlayScene extends Scene {
   _init() {
-    this.make(Hud)
+
+    Sound.music('intro')
+
+    let self = this
+    this.make(Hud, {
+      on_credits() {
+        self.switch_scene(CreditsScene)
+      }
+    })
     this.make(Level1)
   }
+}
+
+class CreditsScene extends Scene {
+
+  texts!: Text[]
+
+  _init() {
+    Sound.music_onoff = false
+
+    this.make(RectPlay, { color: Color.green, x: 0, y: 0, w: 320, h: 180 })
+
+    this.make(Text, { color: Color.lightpurple, x: -1070, y: 1020, size: 9000, text: 'E' })
+
+    let x = 1920 / 4
+
+    this.texts = [
+      this.make(Text, { color: Color.darkpurple, x, y: 100, size: 90, text: 'thanks for playing' }),
+      this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'music github.com/arikwex' }),
+      this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'author twitter.com/eguneys' }),
+      this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 120, text: 'Mucho Gracias <3' }),
+      this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 120, text: 'bb' }),
+    ]
+
+    let self = this
+    this.add_mouse(0, 0, 320, 180, {
+      on_click() {
+        self.switch_scene(StartScene1)
+      }
+    })
+  }
+
+  _update() {
+    this.texts[0].y += Time.delta * 200
+    this.texts[0].y %= this.texts.length * 1080 - 100
+    this.texts.reduce((pre, next) => { 
+      next.y = pre.y - pre.height - 777
+      return next
+    })
+  }
+
 }
 
 class StartScene1 extends Scene {
@@ -426,10 +501,9 @@ class StartScene1 extends Scene {
   begin_text1!: Text
   begin_text2!: Text
 
-  sound_done = false
-
   _first_update() {
     //this.switch_scene(GamePlayScene)
+    //this.switch_scene(CreditsScene)
   }
 
   _init() {
@@ -447,9 +521,14 @@ class StartScene1 extends Scene {
     this.begin_text1 = this.make(Text, { x: 1920*0.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })
     this.begin_text2 = this.make(Text, { x: 1920*1.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })
 
-    Sound.load(p => {
-      if (p === 1) {
-        this.sound_done = true
+    Sound.load(p => { console.log(`lsnd ${p}`) })
+
+    let self = this
+    this.add_mouse(0, 0, 320, 180, {
+      on_click() {
+        if (Sound.loaded) {
+          self.switch_scene(GamePlayScene)
+        }
       }
     })
   }
@@ -464,14 +543,6 @@ class StartScene1 extends Scene {
     }
     if (this.begin_text2.x + this.begin_text2.width > 1920) {
       this.begin_text1.x = this.begin_text2.x - 1920
-    }
-
-
-    if (this.sound_done) {
-      if (Mouse.click) {
-        Sound.music('intro')
-        this.switch_scene(GamePlayScene)
-      }
     }
   }
 }

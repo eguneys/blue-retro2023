@@ -254,11 +254,20 @@ class Sound {
     return res
   }
 
-  _fx!: (name: string) => void
-  _music!: (region?: Region) => void
+  _loaded = false
+  _fx?: (name: string) => void
+  _music?: (region?: Region) => void
+
+  get loaded() {
+    return this._loaded
+  }
 
   async load(on_progress: (p: number) => void) {
+    if (this.loaded) {
+      return
+    }
     [this._fx, this._music] = await make_fx(on_progress)
+    this._loaded = true
     on_progress(1)
   }
 
@@ -272,14 +281,14 @@ class Sound {
   set music_onoff(v: boolean) {
     this._music_onoff = v
     if (!this._music_onoff) {
-      this._music()
+      this._music?.()
     } else {
-      this._music(this._last_music)
+      this._music?.(this._last_music)
     }
   }
 
   fx(name: string) {
-    this._fx(name)
+    this._fx?.(name)
   }
 
   music(region: Region) {
@@ -287,7 +296,7 @@ class Sound {
     if (!this.music_onoff) {
       return
     }
-    this._music(region)
+    this._music?.(region)
   }
 }
 
