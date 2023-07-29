@@ -15,11 +15,26 @@ type SongData = [string, number[], number]
 const sin = (i: number) => Math.sin(i);
 const saw = (i: number) => ((i % 6.28) - 3.14) / 6.28;
 const sqr = (i: number) => clamp(Math.sin(i) * 1000, -1, 1);
+const noise = () => Math.random()
 
+
+let audioCtx: AudioContext, sampleRate: number
+audioCtx = new AudioContext();
+sampleRate = audioCtx.sampleRate;
 
 let songs: SongData[] = []
 let sounds: SoundData[] = [
-  ['grant', 2, (i: number) => sin(i / 50)]
+  ['start', 0.737, (i: number) => 
+    (i*=-999)&&0.6 * sin(i / (20 + sin(i/900 + sin(i / 440 + sin(i / 222))) - i / 400))],
+  ['click', 0.737, (i: number) => 
+    (i*=-999)&&0.6 * sin(i / (20 + sin(i/900 + sin(i / 440 + sin(i / 222))) - i / 400))],
+  ['tense', 1.5, (i: number) => 
+    0.1 * (sqr(i/800)*0.5 + 0.5) * saw(i / 110)],
+  ['short', 0.4, (i: number) => 
+    0.03 * saw(i/4)],
+  ['start2', 3.321, (i: number) => 
+    sqr(i / (20 + i / 100)) + noise() / i * 210 - sin(i*33.22)*6],
+  ['sqr', 1.1415, (i: number) => sqr(i / (111 - i / 54.21))],
 ]
 
 type FxData = string
@@ -44,7 +59,6 @@ const make_fx = async (on_progress: (_: number) => void) => {
 
   let buffer_map: Record<string, AudioBuffer> = {}
 
-  let audioCtx: AudioContext, sampleRate: number
 
   let activeMusicSource: AudioBufferSourceNode
   let musicFocusBuffer: AudioBuffer
@@ -56,8 +70,6 @@ const make_fx = async (on_progress: (_: number) => void) => {
 
   let usingA = true
 
-  audioCtx = new AudioContext();
-  sampleRate = audioCtx.sampleRate;
 
   async function generate(duration: number, fn: (_: number) => number) {
     let audioBuffer = audioCtx.createBuffer(1, sampleRate * duration, sampleRate);
@@ -73,7 +85,7 @@ const make_fx = async (on_progress: (_: number) => void) => {
 
   async function init() {
 
-    let total = sounds.length + songs.length
+    let total = sounds.length + songs.length + 1
 
     for (let i in sounds) {
       let [name, duration, fn] = sounds[i]
@@ -233,7 +245,8 @@ class Sound {
   _fx!: (name: string) => void
 
   async load(on_progress: (p: number) => void) {
-    this.fx = await make_fx(on_progress)
+    this._fx = await make_fx(on_progress)
+    on_progress(1)
   }
 
   fx(name: string) {

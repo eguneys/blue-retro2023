@@ -288,6 +288,7 @@ class Button extends Play {
       let [nx, ny] = Mouse.click
 
       if (rect_vs_point(this.x, this.y, this.w, this.h, nx * 320, ny * 180)) {
+        Sound.fx('click')
         this.click_t = 0.073454
         this.bg.lerp(Color.red, this.click_t)
       }
@@ -411,6 +412,8 @@ class StartScene1 extends Scene {
   begin_text1!: Text
   begin_text2!: Text
 
+  sound_done = false
+
   _first_update() {
     //this.switch_scene(GamePlayScene)
   }
@@ -431,7 +434,9 @@ class StartScene1 extends Scene {
     this.begin_text2 = this.make(Text, { x: 1920*1.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })
 
     Sound.load(p => {
-      console.log(p)
+      if (p === 1) {
+        this.sound_done = true
+      }
     })
   }
 
@@ -448,10 +453,11 @@ class StartScene1 extends Scene {
     }
 
 
-
-    if (Mouse.click) {
-      Sound.fx('grant')
-      this.switch_scene(GamePlayScene)
+    if (this.sound_done) {
+      if (Mouse.click) {
+        Sound.fx('start')
+        this.switch_scene(GamePlayScene)
+      }
     }
   }
 }
