@@ -263,6 +263,7 @@ class Sound {
   }
 
   _music_onoff = true
+  _last_music?: Region
 
   get music_onoff() {
     return this._music_onoff
@@ -272,6 +273,8 @@ class Sound {
     this._music_onoff = v
     if (!this._music_onoff) {
       this._music()
+    } else {
+      this._music(this._last_music)
     }
   }
 
@@ -280,6 +283,7 @@ class Sound {
   }
 
   music(region: Region) {
+    this._last_music = region
     if (!this.music_onoff) {
       return
     }

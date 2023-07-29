@@ -354,14 +354,19 @@ class Hud extends Play {
     })
 
 
-    this.make(Text, { x: 50, y: 170, size: 54, text: 'undescent' })
+    this.make(CText, { x: 50, y: 170, size: 54, text: '1 undescent' })
     this.music_text = this.make(Text, { x: 50, y: 228, size: 54, text: 'music' })
     this.music_ontext = this.make(Text, { x: 280, y: 228, size: 54, text: 'on' })
 
     let self = this
     this.add_mouse(h2l_x(50), h2l_y(228-54), h2l_x(280), h2l_y(54), {
       on_click() {
-        console.log('here')
+        Sound.music_onoff = !Sound.music_onoff
+        if (Sound.music_onoff) {
+          self.music_ontext.text = 'on'
+        } else {
+          self.music_ontext.text = 'off'
+        }
       },
       on_hover_begin() {
         self.music_ontext.color = Color.red
