@@ -4,7 +4,7 @@ An idle clicker game where you try to please the character playing a platformer 
 
 ## Tips
 
-Use magic ratios like these to increase juice `0.86543` instead of dry numbers like `0.7`.
+Use magic ratios like these to increase juice `0.86543` instead of dry numbers like `0.7` or 500.
 
 
 ## Usage
