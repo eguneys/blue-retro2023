@@ -417,6 +417,7 @@ class StartScene1 extends Scene {
 
   _init() {
 
+
     this.make(RectPlay, { color: Color.darkblue, x: 0, y: 0, w: 320, h: 180 })
 
     this.make(Text, { color: Color.lightblue, x: -250, y: 1020, size: 6000, text: 'V' })
@@ -428,6 +429,10 @@ class StartScene1 extends Scene {
     this.make(CText, { x: 1920/3 + 200, y: 900, size: 112, text: 'eguneys', color: Color.light })
     this.begin_text1 = this.make(Text, { x: 1920*0.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })
     this.begin_text2 = this.make(Text, { x: 1920*1.5, y: 1030, size: 62, text: 'click to begin', color: Color.light })
+
+    Sound.load(p => {
+      console.log(p)
+    })
   }
 
   _update() {
@@ -445,7 +450,7 @@ class StartScene1 extends Scene {
 
 
     if (Mouse.click) {
-      Sound.fx('start')
+      Sound.fx('grant')
       this.switch_scene(GamePlayScene)
     }
   }
