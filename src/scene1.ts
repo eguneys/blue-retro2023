@@ -344,7 +344,6 @@ class Hud extends Play {
 
     this.align = []
 
-    this.make(RectPlay, { color: Color.background, x: 0, y: 0, w: 320, h: 180 })
     this.make(RectPlay, { color: Color.darkblue, x: 3, y: 2, w: 84, h: 42 })
     this.make(SRectPlay, { color: Color.lightblue, x: 3, y: 2, w: 84, h: 42 })
     this.make(SRectPlay, { color: Color.red, x: 2, y: 1, w: 86, h: 44 })
@@ -446,13 +445,14 @@ class GamePlayScene extends Scene {
 
     Sound.music('intro')
 
+    this.make(Level1)
+
     let self = this
     this.make(Hud, {
       on_credits() {
         self.switch_scene(CreditsScene)
       }
     })
-    this.make(Level1)
   }
 }
 

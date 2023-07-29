@@ -4,21 +4,103 @@ import Play, { Anim } from './play'
 import Graphics from './graphics'
 import { rnd_int } from './random'
 
+
+/* https://chat.openai.com/share/ff6e1910-1ecf-4556-81f4-5b9e084fd962 */
+function iterate2DArrayWithNeighbors(array: Tile[][]) {
+
+  /*
+    neigbors
+     . 1 .
+     2 c 3
+     . 4 .
+    encoded as 1234
+   */
+  function encode_bitmap(n_id: number, c: Cluster) {
+    return c << ((4 - n_id) * 8)
+  }
+
+  const rows = array.length;
+  const cols = array[0].length;
+
+  // Iterate through each element in the 2D array
+  for (let x = 0; x < rows; x++) {
+    for (let y = 0; y < cols; y++) {
+      let n_mask = 0;
+
+      let neighbors = [
+        [x, y - 1],
+        [x - 1, y],
+        [x + 1, y],
+        [x, y + 1]
+      ]
+      neighbors.forEach(([nx, ny], n_idx) => {
+        n_mask |= encode_bitmap(n_idx + 1, array[nx]?.[ny]?.cluster ?? OUT_OF_BOUNDS);
+      })
+
+      array[x][y].auto_set(n_mask)
+    }
+  }
+}
+
 const sum = (a: number[]) => a.reduce((a, b) => a + b, 0)
 
 const tile_size = 16
 
+// map
+const solids = [
+  [[0,40,21,22]],
+  [[0,4,19,22],[4,32,20,22],[32,40,21,22]]
+]
+
+const ceils = [
+  [[0,10,0,3],[0,5,3,6],[30,40,0,3],[35,40,3,6]],
+  []
+]
+
+type Cluster = number
+// clusters
+const OUT_OF_BOUNDS = 0
+const AIR = 1
+const SOLID = 2
+const CEIL = 3
+
+
+const is_tile_solid: Record<Cluster, boolean> = {
+  [OUT_OF_BOUNDS]: true,
+  [SOLID]: true
+}
+
+
+type NeighborsMask = number
+type XY = [number, number]
+
+const solid_auto_tiles = {
+  b0000: []
+}
+
+
+const neigbors_auto_tiles: Record<Cluster, Record<NeighborsMask, XY>> = {
+  [SOLID]: solid_auto_tiles,
+  [CEIL]: solid_auto_tiles
+}
+
+const default_solid_tile: XY = [0, 0]
+
+const default_tile_for_cluster: Record<Cluster, XY> = {
+  [SOLID]: default_solid_tile,
+  [CEIL]: default_solid_tile,
+  [AIR]: [3, 1]
+}
+
 class Tile {
 
-  static empty = () => new Tile('empty', 0, 0, false)
-  static make = (name: string, x1: number, x2: number, y1: number, y2: number, solid: boolean) => new Tile(name, x1 + rnd_int(x2-x1 + 1), y1 + rnd_int(y2 - y1 + 1), solid)
-
-  get sx() {
-    return this.x * tile_size
-  }
-
-  get sy() {
-    return this.y * tile_size
+  /*
+     . 1 .
+     2 c 3
+     . 4 .
+   */
+  static cluster = (cluster: Cluster) => {
+    return new Tile(cluster)
   }
 
   get sw() {
@@ -29,35 +111,30 @@ class Tile {
     return tile_size
   }
 
-  get empty() {
-    return this.name === 'empty'
+  get solid() {
+    return is_tile_solid[this.cluster]
   }
 
-  constructor(readonly name: string, 
-              readonly x: number, 
-              readonly y: number, 
-              readonly solid: boolean) {}
+  sx!: number
+  sy!: number
+
+  auto_set(neighbors: NeighborsMask) {
+    let [sx, sy] = neigbors_auto_tiles[this.cluster]?.[neighbors] ?? default_tile_for_cluster[this.cluster]
+    this.sx = sx * tile_size
+    this.sy = sy * tile_size
+  }
+
+  constructor(readonly cluster: Cluster) {}
 }
 
 export class Collider {
-
-  static hlines = (x: number, y: number, w: number) => {
-    let h = 1
-    return [
-      new Collider(x, y, tile_size, h, Tile.make('sun', 0, 0, 0, 0, true)),
-      ...[...Array((w-tile_size)/tile_size).keys()].map(i =>
-        new Collider(x + tile_size * (i+1), y, tile_size, h, 
-                     Tile.make('sun', 1, 4, 0, 0, true))),
-      new Collider(x+w-tile_size, y, tile_size, h, Tile.make('sun', 5, 5, 0, 0, true))
-    ]
-  }
 
   private constructor(
     readonly x: number,
     readonly y: number,
     readonly w: number,
     readonly h: number,
-    readonly value: Tile) {}
+    readonly cluster: Cluster) {}
 
 }
 
@@ -72,19 +149,18 @@ export class GridCollider {
   static make = () => {
     let grid = []
     for (let x = 0; x < grid_width; x++) {
-      grid.push(new Array(grid_height).fill(Tile.empty()))
+      grid.push(new Array(grid_height).fill(Tile.cluster(AIR)))
     }
     let res = new GridCollider(grid)
-
-    Collider.platform(0, 180 - cell_size, 320)
-    .forEach(cld => res.add_collider(cld))
-
-
+    res.auto_tiles_set_complete()
     return res
   }
 
   private constructor(readonly grid: Tile[][]) {}
 
+  auto_tiles_set_complete() {
+    iterate2DArrayWithNeighbors(this.grid)
+  }
 
   add_collider(collider: Collider) {
 
@@ -95,7 +171,7 @@ export class GridCollider {
 
     for (let x = x_start; x <= x_end; x++) {
       for (let y = y_start; y <= y_end; y++) {
-        this.grid[x][y] = collider.value
+        this.grid[x][y] = Tile.cluster(collider.cluster)
       }
     }
   }
@@ -120,7 +196,7 @@ export class GridCollider {
     // overuse x y
     for (x = grid_x; x <= grid_end_x; x++) {
       for (y = grid_y; y <= grid_end_y; y++) {
-        if (!this.grid[x][y].empty) {
+        if (this.grid[x][y].solid) {
           return true
         }
       }
@@ -187,11 +263,9 @@ export class PhCollider extends Play {
           g.srect(d_colors[(x + y) / cell_size % 2], x, y, cell_size, cell_size)
         }
       } else {
-        if (!tile.empty) {
-          let dx = x, dy = y
-          let { sx, sy, sw, sh } = tile
-          g.spr(dx, dy, sx, sy, sw, sh)
-        }
+        let dx = x, dy = y
+        let { sx, sy, sw, sh } = tile
+        g.spr(dx, dy, sx, sy, sw, sh)
       }
     })
   }
