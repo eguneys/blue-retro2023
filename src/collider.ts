@@ -1,21 +1,67 @@
 import Time from './time'
 import Color from './color'
-import Play from './play'
+import Play, { Anim } from './play'
 import Graphics from './graphics'
+import { rnd_int } from './random'
+
+const sum = (a: number[]) => a.reduce((a, b) => a + b, 0)
+
+const tile_size = 8
+
+class Tile {
+
+  static empty = () => new Tile('empty', 0, 0, false)
+  static make = (name: string, x1: number, x2: number, y1: number, y2: number, solid: boolean) => new Tile(name, x1 + rnd_int(x2-x1 + 1), y1 + rnd_int(y2 - y1 + 1), solid)
+
+  get sx() {
+    return this.x * tile_size
+  }
+
+  get sy() {
+    return this.y * tile_size
+  }
+
+  get sw() {
+    return tile_size
+  }
+
+  get sh() {
+    return tile_size
+  }
+
+  get empty() {
+    return this.name === 'empty'
+  }
+
+  constructor(readonly name: string, 
+              readonly x: number, 
+              readonly y: number, 
+              readonly solid: boolean) {}
+}
+
+const split_w = (w: number) => {
+  let res = []
+  while (w >= 8) {
+    let n = 8 + rnd_int(Math.min(rnd_int(rnd_int(32)), w - 8))
+    res.push(n)
+    w -= n
+  }
+  console.log(sum(res))
+  return res
+}
 
 export class Collider {
 
-  static rect = (x: number, y: number, w: number, h: number) => {
-    return new Collider(x, y, w, h)
-  }
-
-  static hline = (x: number, y: number, w: number) => {
+  static hlines = (x: number, y: number, w: number) => {
     let h = 1
-    return new Collider(x, y, w, h)
-  }
-  static vline = (x: number, y: number, h: number) => {
-    let w = 1
-    return new Collider(x, y, w, h)
+    return [
+      ...split_w(w - 16).reduce((acc, w) => [
+        new Collider(acc[0].x + acc[0].w, y, w, h, 
+                     Tile.make('sun', 1, 4, 0, 0, true)), ...acc], [
+        new Collider(x, y, 8, h, Tile.make('sun', 0, 0, 0, 0, true)),
+      ]),
+      new Collider(x+w-8, y, 8, h, Tile.make('sun', 5, 5, 0, 0, true))
+    ]
   }
 
   private constructor(
@@ -23,7 +69,7 @@ export class Collider {
     readonly y: number,
     readonly w: number,
     readonly h: number,
-    readonly value = true) {}
+    readonly value: Tile) {}
 
 }
 
@@ -38,17 +84,19 @@ export class GridCollider {
   static make = () => {
     let grid = []
     for (let x = 0; x < grid_width; x++) {
-      grid.push(new Array(grid_height).fill(false))
+      grid.push(new Array(grid_height).fill(Tile.empty()))
     }
     let res = new GridCollider(grid)
 
-    res.add_collider(Collider.hline(0, 180 - cell_size, 320))
+    Collider.hlines(0, 180 - cell_size, 320)
+    .forEach(cld => res.add_collider(cld))
 
+    console.log('here',Collider.hlines(0, 180 - cell_size, 320).map(_ => _.x))
 
     return res
   }
 
-  private constructor(readonly grid: boolean[][]) {}
+  private constructor(readonly grid: Tile[][]) {}
 
 
   add_collider(collider: Collider) {
@@ -85,23 +133,59 @@ export class GridCollider {
     // overuse x y
     for (x = grid_x; x <= grid_end_x; x++) {
       for (y = grid_y; y <= grid_end_y; y++) {
-        if (this.grid[x][y]) {
+        if (!this.grid[x][y].empty) {
           return true
         }
       }
     }
     return false
   }
+
+  get tiles(): [number, number, Tile][] {
+    let res = []
+    for (let x = 0; x < grid_width; x++) {
+      for (let y = 0; y < grid_height; y++) {
+        res.push([x * cell_size, y * cell_size, this.grid[x][y]] as [number, number, Tile])
+      }
+    }
+    return res
+  }
 }
 
+type TilePlayData = {
+  x: number,
+  y: number,
+  tile: Tile
+}
+class TilePlay extends Play {
+
+  get data() {
+    return this._data as TilePlayData
+  }
+
+  anim!: Anim
+
+  _init() {
+    let { x, y } = this.data
+    this.anim = this.make(Anim, {
+      x, y, name
+    })
+  }
+}
 
 let d_colors = [Color.red, Color.darkred]
 export class PhCollider extends Play {
   grid!: GridCollider
 
+  _anims_by_tile!: Map<Tile, TilePlay>
+
+  debug = false
+
   _init() {
     this.grid = GridCollider.make()
+    this._anims_by_tile = new Map()
   }
+
 
   _update() {
     if (Time.on_interval(0.86543)) {
@@ -110,12 +194,18 @@ export class PhCollider extends Play {
   }
 
   _draw(g: Graphics) {
-    for (let x = 0; x < 320; x+= cell_size) {
-      for (let y = 0; y < 180; y += cell_size) {
-        if (this.grid.is_solid_rect(x, y)) {
+    this.grid.tiles.forEach(([x, y, tile]) => {
+      if (this.debug) {
+        if (tile.solid) {
           g.srect(d_colors[(x + y) / cell_size % 2], x, y, cell_size, cell_size)
         }
+      } else {
+        if (!tile.empty) {
+          let dx = x, dy = y
+          let { sx, sy, sw, sh } = tile
+          g.spr(dx, dy, sx, sy, sw, sh)
+        }
       }
-    }
+    })
   }
 }
