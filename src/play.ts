@@ -1,6 +1,18 @@
 import Time from './time'
+import Mouse from './mouse'
 import Content from './content'
 import Graphics from './graphics'
+import { RectKey, rect_vs_point, key2rect, rect2key } from './rect'
+
+type ClickHandler = () => void
+type MouseHooks = {
+  on_click?: ClickHandler,
+  on_hover_begin?: ClickHandler,
+  on_hover_end?: ClickHandler
+}
+type MouseHandler = MouseHooks & {
+  _hovering: boolean,
+}
 
 export default abstract class Play {
 
@@ -14,8 +26,18 @@ export default abstract class Play {
   life!: number
   objects: Play[]
 
+  _mouses: Map<RectKey, MouseHandler>
+
+  add_mouse(x: number, y: number, w: number, h: number, handler: MouseHooks) {
+    let key = rect2key(x, y, w, h)
+    this._mouses.set(key, { ...handler, _hovering: false })
+  }
+
+
+
   constructor() {
     this.objects = []
+    this._mouses = new Map()
   }
 
   _make<T extends Play>(ctor: { new (): T }, data: any) {
@@ -51,6 +73,37 @@ export default abstract class Play {
     }
     this.objects.forEach(_ => _.update())
     this.life += Time.delta
+
+    if (Mouse.click) {
+      let x = Mouse.click[0] * 320
+      let y = Mouse.click[1] * 180
+      for (let [key, handler] of this._mouses) {
+        if (rect_vs_point(...key2rect(key), x, y)) {
+          handler.on_click?.()
+        }
+      }
+    }
+
+    if (Mouse.move) {
+      let x = Mouse.move[0] * 320
+      let y = Mouse.move[1] * 180
+
+      for (let [key, handler] of this._mouses) {
+        if (rect_vs_point(...key2rect(key), x, y)) {
+
+          if (!handler._hovering) {
+            handler._hovering = true
+            handler.on_hover_begin?.()
+          }
+        } else {
+          if (handler._hovering) {
+            handler.on_hover_end?.()
+          }
+          handler._hovering = false
+        }
+      }
+    }
+
     this._update()
   }
 

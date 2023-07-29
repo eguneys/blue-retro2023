@@ -4,13 +4,12 @@ function clamp(v: number, min: number, max: number) {
 
 type Event = string
 
-const EVENT_REGION = 'on_region'
 const EVENT_FOCUS = 'on_focus'
 const EVENT_FOCUS_STOP = 'on_focus_stop'
 
 
 type SoundData = [string, number, (_: number) => number]
-type SongData = [string, number[], number]
+type SongData = [Region, [number[], number], number]
 
 const sin = (i: number) => Math.sin(i);
 const saw = (i: number) => ((i % 6.28) - 3.14) / 6.28;
@@ -22,7 +21,9 @@ let audioCtx: AudioContext, sampleRate: number
 audioCtx = new AudioContext();
 sampleRate = audioCtx.sampleRate;
 
-let songs: SongData[] = []
+let songs: SongData[] = [
+  ['intro', [[0, 2, 3, 5, 7, 12], 1.3], 0]
+]
 let sounds: SoundData[] = [
   ['start', 0.737, (i: number) => 
     (i*=-999)&&0.6 * sin(i / (20 + sin(i/900 + sin(i / 440 + sin(i / 222))) - i / 400))],
@@ -62,7 +63,7 @@ const make_fx = async (on_progress: (_: number) => void) => {
 
   let activeMusicSource: AudioBufferSourceNode
   let musicFocusBuffer: AudioBuffer
-  let musicRegionBuffers: Record<Region, AudioBuffer>
+  let musicRegionBuffers: Record<Region, AudioBuffer> = {}
 
   let musicDrumBuffer: AudioBuffer, drumBuffer: Float32Array
   let gainNodeA: GainNode, gainNodeB: GainNode
@@ -118,10 +119,9 @@ const make_fx = async (on_progress: (_: number) => void) => {
       let res = await genericSongBuilder(melody, seed);
       setProgress((Number(i) + 1) / total)
 
-      buffer_map[name] = res
+      musicRegionBuffers[name] = res
     }
 
-    bus_on(EVENT_REGION, onRegion);
     bus_on(EVENT_FOCUS, () => {
       focusNode = audioCtx.createBufferSource();
       focusNode.buffer = musicFocusBuffer;
@@ -208,18 +208,28 @@ const make_fx = async (on_progress: (_: number) => void) => {
     source.start();
   };
 
-  function onRegion(regionId: Region) {
+  function onRegion(regionId?: Region) {
+    if (!regionId) {
+      music()
+      return
+    }
+    let res = musicRegionBuffers[regionId]
+    if (!res) {
+      throw `nomusic ${regionId}`
+    }
     music(musicRegionBuffers[regionId]);
   }
 
-  function music(musicBuffer: AudioBuffer) {
+  function music(musicBuffer?: AudioBuffer) {
     let audioToStop = activeMusicSource;
 
-    activeMusicSource = audioCtx.createBufferSource();
-    activeMusicSource.buffer = musicBuffer;
-    activeMusicSource.loop = true;
-    activeMusicSource.connect(usingA ? gainNodeA : gainNodeB);
-    activeMusicSource.start();
+    if (musicBuffer) {
+      activeMusicSource = audioCtx.createBufferSource();
+      activeMusicSource.buffer = musicBuffer;
+      activeMusicSource.loop = true;
+      activeMusicSource.connect(usingA ? gainNodeA : gainNodeB);
+      activeMusicSource.start();
+    }
 
     setTimeout(() => { audioToStop?.stop() }, 700);
     gainNodeA.gain.setTargetAtTime(usingA ? 1 : 0, audioCtx.currentTime, 0.5);
@@ -229,9 +239,11 @@ const make_fx = async (on_progress: (_: number) => void) => {
 
   await init()
 
-  return (name: string) => {
-    play(buffer_map[name])
-  }
+  return [
+    (name: string) => play(buffer_map[name]),
+    (region?: Region) => onRegion(region)
+  ] as [(name: string) => void, (region?: Region) => void]
+
 }
 
 
@@ -243,14 +255,35 @@ class Sound {
   }
 
   _fx!: (name: string) => void
+  _music!: (region?: Region) => void
 
   async load(on_progress: (p: number) => void) {
-    this._fx = await make_fx(on_progress)
+    [this._fx, this._music] = await make_fx(on_progress)
     on_progress(1)
+  }
+
+  _music_onoff = true
+
+  get music_onoff() {
+    return this._music_onoff
+  }
+
+  set music_onoff(v: boolean) {
+    this._music_onoff = v
+    if (!this._music_onoff) {
+      this._music()
+    }
   }
 
   fx(name: string) {
     this._fx(name)
+  }
+
+  music(region: Region) {
+    if (!this.music_onoff) {
+      return
+    }
+    this._music(region)
   }
 }
 

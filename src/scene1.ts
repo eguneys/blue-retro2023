@@ -6,14 +6,15 @@ import Graphics from './graphics'
 import Sound from './sound'
 import { PhCollider } from './collider'
 import { arr_rnd } from './random'
+import { rect_vs_point } from './rect'
 import Mouse from './mouse'
 
 const l2h_x = (x: number) => x / 320 * 1920
 const l2h_y = (y: number) => y / 180 * 1080
+const h2l_x = (x: number) => x / 1920 * 320
+const h2l_y = (y: number) => y / 1080 * 180
 
-const rect_vs_point = (x: number, y: number, w: number, h: number, ax: number, ay: number) => {
-  return x <= ax && ax <= x + w && y <= ay && ay <= y + h
-}
+
 
 abstract class LevelP extends Play {
 
@@ -270,6 +271,23 @@ class Button extends Play {
 
 
     this.make(Text, { x: l2h_x(w / 2 - 2), y: l2h_y(h / 2 + 2), size: 74, text: this.data.text, align: 'c' })
+
+    let self = this
+    this.add_mouse(this.x, this.y, this.w, this.h, {
+      on_click() {
+        Sound.fx('click')
+        self.click_t = 0.073454
+        self.bg.lerp(Color.red, self.click_t)
+      },
+
+      on_hover_begin() {
+        self.bg.lerp(Color.lightblue)
+      },
+      on_hover_end() {
+        self.bg.lerp(Color.darkblue)
+      }
+    })
+
   }
 
   _update() {
@@ -284,32 +302,6 @@ class Button extends Play {
       }
     }
 
-    if (Mouse.click) {
-      let [nx, ny] = Mouse.click
-
-      if (rect_vs_point(this.x, this.y, this.w, this.h, nx * 320, ny * 180)) {
-        Sound.fx('click')
-        this.click_t = 0.073454
-        this.bg.lerp(Color.red, this.click_t)
-      }
-
-    }
-    if (Mouse.move) {
-      let [nx, ny] = Mouse.move
-
-      if (rect_vs_point(this.x, this.y, this.w, this.h, nx * 320, ny * 180)) {
-
-        if (!this.hovering) {
-          this.hovering = true
-          this.bg.lerp(Color.lightblue)
-        }
-      } else {
-        if (this.hovering) {
-          this.bg.lerp(Color.darkblue)
-        }
-        this.hovering = false
-      }
-    }
   }
 
   _pre_draw(g: Graphics, t: Graphics) {
@@ -338,6 +330,9 @@ class Hud extends Play {
   blue_text!: Text
   retro_text!: Text
 
+  music_text!: Text
+  music_ontext!: Text
+
   _init() {
 
     this.align = []
@@ -360,7 +355,21 @@ class Hud extends Play {
 
 
     this.make(Text, { x: 50, y: 170, size: 54, text: 'undescent' })
-    this.make(Text, { x: 50, y: 228, size: 54, text: 'ipsum dolor' })
+    this.music_text = this.make(Text, { x: 50, y: 228, size: 54, text: 'music' })
+    this.music_ontext = this.make(Text, { x: 280, y: 228, size: 54, text: 'on' })
+
+    let self = this
+    this.add_mouse(h2l_x(50), h2l_y(228-54), h2l_x(280), h2l_y(54), {
+      on_click() {
+        console.log('here')
+      },
+      on_hover_begin() {
+        self.music_ontext.color = Color.red
+      },
+      on_hover_end() {
+        self.music_ontext.color = Color.light
+      }
+    })
 
     this.make(Button, { x: 250, y: 4, text: 'Right' })
     this.make(Button, { x: 180, y: 4, text: 'Left' })
@@ -455,7 +464,7 @@ class StartScene1 extends Scene {
 
     if (this.sound_done) {
       if (Mouse.click) {
-        Sound.fx('start')
+        Sound.music('intro')
         this.switch_scene(GamePlayScene)
       }
     }
