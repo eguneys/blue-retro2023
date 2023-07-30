@@ -34,4 +34,28 @@ I am writing this post mortem, while coding the game, I don't know if people do 
 
 I also have been active in Slack group, so check that out too.
 
+I use vite development server, for instant updates and smooth development experience, and vast plugins.
+
+I have a tool called [aset](https://github.com/eguneys/aset), which parses aseprite files, and for packing those into an atlas. I have scripts to watch for file changes and load the art content directly into game, so that's good. It also optimizes the png file to shrink further.
+
+I didn't use roadroller because of [some import.meta bug](https://stackoverflow.com/questions/76765987/cannot-use-import-meta-even-though-type-module-is-enabled-on-github-pages).
+
+I didn't use ect just a zip, I don't know how much it would've shrinked further. I have scripts to build the final zipped dist.zip file so that's also good.
+
+About minifying the code, vite uses terser by default, I couldn't get google closure to work, terser has some caveats which I have to manually exclude some of the variable names that shouldn't get minified, otherwise it breaks the bundled game, so that's not good.
+
+I have github workflows setup, so It instantly releases the game into github pages after a push to main branch, so that's good to share easily.
+
+Coding;
+
+I've reused some of the old code from my [2022 entry](https://github.com/eguneys/mavi-js2022) which used webgl. This time I wanted to focus only on game so I rewrote that with `CanvasRenderingContext2D` which helps reduce the size. Actually I rewrote everything from scratch what am I talking about.
+
+Except the base class called `Play` which handles grouping of objects into a nested hierarchy and manages input handlers and things like that.
+
+I have a physics and collision detection system for platforming elements. You can check my previous entries, for [my previous experience](https://eguneys.github.io/js13k2020.html).
+I handled both mouse and keyboard input because of gameplay needs.
+I setup a basic scene system, where you can switch between scenes like intro gameplay credits etc.
+An animation system which loads the info from parsing the content, then can play animations defined directly within aseprite by giving the filename and tag name, that's neat.
+
+A challenging part is the tile system and auto tiles, which I managed with the help of ChatGPT and some research. I've always wondered how those spritesheets that is I think called tilesets map into level design, know I got some ideas.
 
