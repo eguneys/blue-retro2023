@@ -59,3 +59,7 @@ An animation system which loads the info from parsing the content, then can play
 
 A challenging part is the tile system and auto tiles, which I managed with the help of ChatGPT and some research. I've always wondered how those spritesheets that is I think called tilesets map into level design, know I got some ideas.
 
+
+### P.S.
+
+I highly recommend checking out the author of Celeste, [NoelFB](https://github.com/NoelFB). I have a webgl rendering and game related stuff library copied from his code [here](https://github.com/eguneys/blah).
