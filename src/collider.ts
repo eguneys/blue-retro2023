@@ -94,11 +94,6 @@ const default_tile_for_cluster: Record<Cluster, XY> = {
 
 class Tile {
 
-  /*
-     . 1 .
-     2 c 3
-     . 4 .
-   */
   static cluster = (cluster: Cluster) => {
     return new Tile(cluster)
   }
