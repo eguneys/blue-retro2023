@@ -7,6 +7,7 @@ import Sound from './sound'
 import { PhCollider } from './collider'
 import { arr_rnd } from './random'
 import { rect_vs_point } from './rect'
+import { Progress } from './code'
 
 const l2h_x = (x: number) => x / 320 * 1920
 const l2h_y = (y: number) => y / 180 * 1080
@@ -456,9 +457,13 @@ class GamePlayScene extends Scene {
   }
 }
 
+const progress = Progress.make()
+
 class CreditsScene extends Scene {
 
   texts!: Text[]
+
+  code_text!: Text
 
   _init() {
     Sound.music_onoff = false
@@ -469,12 +474,18 @@ class CreditsScene extends Scene {
 
     let x = 1920 / 4
 
+    this.code_text = 
+      this.make(Text, { color: Color.darkpurple, x, y: 100, size: 40, text: 'please send your secret code wait_x2_not in the end to me ;)' }),
+
     this.texts = [
       this.make(Text, { color: Color.darkpurple, x, y: 100, size: 90, text: 'thanks for playing' }),
+
+      this.code_text,
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'art twitter.com/_V3X3D' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'music github.com/arikwex' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'author twitter.com/eguneys' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 120, text: 'Mucho Gracias <3' }),
+      this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 80, text: 'Check out my PostMortem too!' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 120, text: 'bb' }),
     ]
 
@@ -488,6 +499,9 @@ class CreditsScene extends Scene {
 
   _update() {
     this.texts[0].y += Time.delta * 200
+    if (this.texts[0].y > this.texts.length * 1080 - 100) {
+      this.code_text.text = this.code_text.text.replace('wait_x2_not', progress.code)
+    }
     this.texts[0].y %= this.texts.length * 1080 - 100
     this.texts.reduce((pre, next) => { 
       next.y = pre.y - pre.height - 777
