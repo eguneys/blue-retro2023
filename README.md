@@ -23,6 +23,7 @@ aseprite files go into `assets/sprites` folder. `out_0.png` files built into `as
 
 
 ## Interesting ChatGPT Conversations
+- [jokes and silence](https://chat.openai.com/share/98466d46-7fae-4478-9bae-5383720790e4)
 - [game theme chaos and order](https://chat.openai.com/share/9cef6b75-dfcd-4ff3-9b3f-b3f7bbc8c0db)
 - [normal numbers](https://chat.openai.com/share/6b1f9b25-7922-4a01-b10c-a8e1f18ee27a)
 - [simpler perlin noise](https://chat.openai.com/share/37a84a0b-9180-48df-9e2f-e49fb887a5bd)
