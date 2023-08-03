@@ -4,21 +4,21 @@ import Play, { Anim } from './play'
 import Graphics from './graphics'
 import { rnd_int } from './random'
 
+/*
+   neigbors
+   . 1 .
+   2 c 3
+   . 4 .
+   encoded as 1234
+   */
+function encode_bitmap(n_id: number, c: Cluster) {
+  return c << ((4 - n_id) * 8)
+}
+
+
 
 /* https://chat.openai.com/share/ff6e1910-1ecf-4556-81f4-5b9e084fd962 */
 function iterate2DArrayWithNeighbors(array: Tile[][]) {
-
-  /*
-    neigbors
-     . 1 .
-     2 c 3
-     . 4 .
-    encoded as 1234
-   */
-  function encode_bitmap(n_id: number, c: Cluster) {
-    return c << ((4 - n_id) * 8)
-  }
-
   const rows = array.length;
   const cols = array[0].length;
 
@@ -46,10 +46,9 @@ const sum = (a: number[]) => a.reduce((a, b) => a + b, 0)
 
 const tile_size = 16
 
-// map
+// map  20x13
 const solids = [
-  [[0,40,21,22]],
-  [[0,4,19,22],[4,32,20,22],[32,40,21,22]]
+  [ [0,3,8,12], [3,16,9,12], [16,20,10,12]]
 ]
 
 const ceils = [
@@ -70,16 +69,28 @@ const is_tile_solid: Record<Cluster, boolean> = {
   [SOLID]: true
 }
 
+function ulrd(up: number, left: number, right: number, down: number) {
+  return encode_bitmap(1, up) | 
+    encode_bitmap(2, left) | 
+    encode_bitmap(3, right) | 
+    encode_bitmap(4, down)
+}
 
 type NeighborsMask = number
 type XY = [number, number]
 
-const solid_auto_tiles = {
-  b0000: []
+const solid_auto_tiles: Record<NeighborsMask, XY> = {
+  [ulrd(AIR, SOLID, AIR, SOLID)]: [4, 0],
+  [ulrd(AIR, SOLID, SOLID, SOLID)]: [1, 0],
+  [ulrd(SOLID, SOLID, SOLID, SOLID)]: [3, 2],
+  [ulrd(SOLID, OUT_OF_BOUNDS, SOLID, SOLID)]: [0, 2],
+  [ulrd(SOLID, SOLID, SOLID, OUT_OF_BOUNDS)]: [3, 2],
+  [ulrd(SOLID, OUT_OF_BOUNDS, SOLID, OUT_OF_BOUNDS)]: [3, 2],
 }
 
+console.log(ulrd(AIR, SOLID, SOLID, AIR))
 
-const neigbors_auto_tiles: Record<Cluster, Record<NeighborsMask, XY>> = {
+const neighbors_auto_tiles: Record<Cluster, Record<NeighborsMask, XY>> = {
   [SOLID]: solid_auto_tiles,
   [CEIL]: solid_auto_tiles
 }
@@ -114,7 +125,7 @@ class Tile {
   sy!: number
 
   auto_set(neighbors: NeighborsMask) {
-    let [sx, sy] = neigbors_auto_tiles[this.cluster]?.[neighbors] ?? default_tile_for_cluster[this.cluster]
+    let [sx, sy] = neighbors_auto_tiles[this.cluster]?.[neighbors] ?? default_tile_for_cluster[this.cluster]
     this.sx = sx * tile_size
     this.sy = sy * tile_size
   }
@@ -134,18 +145,38 @@ export class Collider {
 }
 
 export const cell_size = 16
-export const grid_width = 40 // Math.ceil(320 / cell_size)
-export const grid_height = 23 // Math.ceil(180 / cell_size)
+export const grid_width = 20 // Math.ceil(320 / cell_size)
+export const grid_height = 12 // Math.ceil(180 / cell_size)
 
 type XYWH = { x: number, y: number, w: number, h: number }
 
 export class GridCollider {
 
   static make = () => {
-    let grid = []
-    for (let x = 0; x < grid_width; x++) {
+    let grid: Tile[][] = []
+    for (let x = 0; x <= grid_width; x++) {
       grid.push(new Array(grid_height).fill(Tile.cluster(AIR)))
     }
+
+
+    // TODO
+    solids.forEach(xs => {
+      xs.forEach(x => {
+        let [x1, x2, y1, y2] = x
+
+        while (y1 < y2) {
+          let i = x1
+          while (i < x2) {
+            grid[Math.floor(i)][Math.floor(y1)] = Tile.cluster(SOLID)
+            i++;
+          }
+          y1++;
+        }
+      })
+    })
+
+    //grid[0][10] = Tile.cluster(SOLID)
+
     let res = new GridCollider(grid)
     res.auto_tiles_set_complete()
     return res
@@ -199,6 +230,7 @@ export class GridCollider {
     return false
   }
 
+  // TODO cache
   get tiles(): [number, number, Tile][] {
     let res = []
     for (let x = 0; x < grid_width; x++) {
