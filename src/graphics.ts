@@ -114,7 +114,7 @@ export default class Graphics {
        let dHeight = sHeight * Math.abs(scale_y)
 
 
-       ctx.scale(scale_x, scale_y)
+       ctx.scale(scale_x.toFixed(2), scale_y.toFixed(2))
        if (scale_x < 0) {
          dx *= -1
          dx -= dWidth
@@ -124,7 +124,7 @@ export default class Graphics {
          dy -= dHeight
        }
 
-       ctx.drawImage(image, sx, sy, sWidth, sHeight, Math.round(dx), Math.round(dy), dWidth, dHeight)
+       ctx.drawImage(image, sx, sy, sWidth, sHeight, Math.round(dx), Math.round(dy), Math.round(dWidth), Math.round(dHeight))
 
        ctx.restore()
   }

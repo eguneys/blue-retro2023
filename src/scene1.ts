@@ -15,6 +15,15 @@ const h2l_x = (x: number) => x / 1920 * 320
 const h2l_y = (y: number) => y / 1080 * 180
 
 
+const max_nb = 3
+const small_epsilon = 1e-5
+const epsilon = 1
+const max_dx = 2.58002
+const G = 4.1812
+const max_dy = 1.3 * G
+const jump_dy = max_dy
+const jump_max_accel_y = 0.044311
+const fall_max_accel_y = 0.877
 
 abstract class LevelP extends Play {
 
@@ -40,58 +49,77 @@ abstract class LevelP extends Play {
     // 2 pixel perfect collision detection
     bodies.forEach(body => {
 
-      let nb = 3
+      let nb = max_nb
 
-      let skip_next = false
-      for (let i = nb; i >= 1; i--) {
+      for (let i = nb; i >= 1; i--)
+      {
 
         let ni = (i * 2) / (nb * nb)
 
-        let dx = Math.abs(body.dx)
-        let sign = Math.sign(body.dx)
-
         {
+
+          let dx = Math.abs(body.dx)
+          let sign = Math.sign(body.dx)
+
           for (let di = ni; di <= dx; di+= ni) {
-            let dix = sign * di * Time.delta
-            let diy = sign * ni * Time.delta
-            if (grid.is_solid_xywh(body, dix, diy)) {
-              console.log(body.x, body.y, dix, diy)
-              if (!grid.is_solid_xywh(body, dix + cell_size, diy)) {
+            let dxx = 1/2 * sign * di * Math.sqrt(Time.delta)
+            if (grid.is_solid_xywh(body, dxx, 0)) {
+              body.collide_h = sign
+              body.dx = 0
+              break
+            } else {
+              body.collide_h = 0
+              body.x += dxx
+            }
+          }
+        }
 
-                body.x += dix
-                body.y += diy
+        let decrease_g = 0
+        {
 
-                skip_next = true
+          let dy = Math.abs(body.dy)
+          let sign = Math.sign(body.dy)
+
+          for (let di = ni; di <= dy; di+= ni) {
+            let dyy = 1/2 * sign * di * Math.sqrt(Time.delta)
+            if (grid.is_solid_xywh(body, 0, dyy)) {
+              body.collide_v = sign
+              body.dy = 0
+              decrease_g = 0
+              break
+            } else {
+              body.collide_v = 0
+              body.y += dyy
+              decrease_g = (1 - sign * ((di - ni) / (dy - ni)))
+
+              {
+
+                let dii = jump_max_accel_y * G * Math.sqrt(decrease_g)
+                let sign = 1
+
+                body.dy += sign * dii * Time.delta
               }
             }
           }
-
-          if (skip_next) {
-            continue
-          }
         }
 
-        for (let di = ni; di <= dx; di+= ni) {
-          if (grid.is_solid_xywh(body, sign * di * Time.delta, 0)) {
-            body.dx = 0
-            break
-          } else {
-            body.x += sign * di * Time.delta
+        {
+
+          let dy = fall_max_accel_y * G
+          let sign = 1
+
+          for (let di = ni; di <= dy; di+= ni) {
+            let dyy = 1/2 * sign * di * Math.sqrt(Time.delta)
+           if (grid.is_solid_xywh(body, 0, dyy)) {
+              body.collide_v = sign
+              body.dy = 0
+              break
+            } else {
+              body.collide_v = 0
+              body.y += dyy
+            }
           }
         }
-
-        let dy = Math.abs(body.dy)
-        sign = Math.sign(body.dy)
-
-        for (let di = ni; di <= dy; di+= ni) {
-          if (grid.is_solid_xywh(body, 0, sign * di * Time.delta)) {
-            body.dy = 0
-            break
-          } else {
-            body.y += sign * di * Time.delta
-          }
-        }
-
       }
     })
   }
@@ -112,6 +140,27 @@ abstract class PhBody extends Play {
   get data() {
     return this._data as PhBodyData
   }
+
+
+  public collide_v!: number
+  public collide_h!: number
+
+  get ceiling() {
+    return this.collide_v < 0
+  }
+
+  get grounded() {
+    return this.collide_v > 0
+  }
+
+  get left_wall() {
+    return this.collide_h < 0
+  }
+
+  get right_wall() {
+    return this.collide_h > 0
+  }
+
 
   private _w!: number
   private _h!: number
@@ -183,7 +232,6 @@ abstract class PhBodyAnim extends PhBody {
   }
 }
 
-const max_dx = 3.6912
 
 class Player extends PhBodyAnim {
 
@@ -199,6 +247,11 @@ class Player extends PhBodyAnim {
       this.dx = 0
     }
 
+    if (Input.btn('jump')) {
+      if (this.grounded) {
+        this.dy = -jump_dy
+      }
+    }
   }
 
 }
@@ -712,7 +765,7 @@ class Level1 extends LevelP {
     let p1 = this.world.body(Player, {
       name: `player`,
       x: 8,
-      y: 16,
+      y: 80,
       w: 16,
       h: 16,
       s_origin: 'bc'
