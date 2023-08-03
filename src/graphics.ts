@@ -114,7 +114,7 @@ export default class Graphics {
        let dHeight = sHeight * Math.abs(scale_y)
 
 
-       ctx.scale(scale_x.toFixed(2), scale_y.toFixed(2))
+       ctx.scale(Number(scale_x.toFixed(2)), Number(scale_y.toFixed(2)))
        if (scale_x < 0) {
          dx *= -1
          dx -= dWidth
