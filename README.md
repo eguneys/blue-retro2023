@@ -27,6 +27,7 @@ aseprite files go into `assets/sprites` folder. `out_0.png` files built into `as
 - [satisfactory](https://chat.openai.com/share/08945156-4feb-4c3e-ae9c-fb66ef9e89f8)
 - [game theme chaos and order](https://chat.openai.com/share/9cef6b75-dfcd-4ff3-9b3f-b3f7bbc8c0db)
 - [normal numbers](https://chat.openai.com/share/6b1f9b25-7922-4a01-b10c-a8e1f18ee27a)
+- [smart fly movement](https://chat.openai.com/share/27f6085e-3911-4944-b805-580f9aeb007a)
 - [simpler perlin noise](https://chat.openai.com/share/37a84a0b-9180-48df-9e2f-e49fb887a5bd)
 - [blending canvas 2d](https://chat.openai.com/share/9f0fbf85-231c-4c08-a912-4457e9c5f0b7)
 - [input handling 2d platformer](https://chat.openai.com/share/e35a861b-0d02-4f28-897f-d1afb5a6b95e)
