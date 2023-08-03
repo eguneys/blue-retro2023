@@ -142,6 +142,12 @@ abstract class PhBody extends Play {
   }
 
 
+  switch<T extends PhBody>(ctor: { new (): T }, data: any = {}) {
+    this.world._switch(this, ctor, data)
+  }
+
+  public world!: PhWorld
+
   public collide_v!: number
   public collide_h!: number
 
@@ -200,8 +206,23 @@ class PhWorld extends Play {
   }
 
   body<T extends PhBody>(ctor: { new (): T }, data: any = {}) {
-    return this.make(ctor, data)
+    let res = this.make(ctor, data)
+    res.world = this
+    return res
   }
+
+
+
+  _switch<T extends PhBody>(old: PhBody, ctor: { new (): T }, data: any = {}) {
+    let i =  this.bodies.indexOf(old)
+    if (i === -1) {
+      throw 'nobody'
+    }
+    this.bodies.splice(i, 1)
+
+    return this.body(ctor, data)
+  }
+
 }
 
 type PhBodyAnimData = AnimData & PhBodyData
