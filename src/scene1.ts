@@ -4,7 +4,7 @@ import Time from './time'
 import Input from './input'
 import Graphics from './graphics'
 import Sound from './sound'
-import { PhCollider } from './collider'
+import { cell_size, PhCollider } from './collider'
 import { arr_rnd } from './random'
 import { rect_vs_point } from './rect'
 import { Progress } from './code'
@@ -42,11 +42,36 @@ abstract class LevelP extends Play {
 
       let nb = 3
 
-      for (let i = 0; i < nb; i++) {
+      let skip_next = false
+      for (let i = nb; i >= 1; i--) {
+
+        let ni = (i * 2) / (nb * nb)
+
         let dx = Math.abs(body.dx)
         let sign = Math.sign(body.dx)
 
-        for (let di = 1/nb; di <= dx; di+= 1/nb) {
+        {
+          for (let di = ni; di <= dx; di+= ni) {
+            let dix = sign * di * Time.delta
+            let diy = sign * ni * Time.delta
+            if (grid.is_solid_xywh(body, dix, diy)) {
+              console.log(body.x, body.y, dix, diy)
+              if (!grid.is_solid_xywh(body, dix + cell_size, diy)) {
+
+                body.x += dix
+                body.y += diy
+
+                skip_next = true
+              }
+            }
+          }
+
+          if (skip_next) {
+            continue
+          }
+        }
+
+        for (let di = ni; di <= dx; di+= ni) {
           if (grid.is_solid_xywh(body, sign * di * Time.delta, 0)) {
             body.dx = 0
             break
@@ -58,7 +83,7 @@ abstract class LevelP extends Play {
         let dy = Math.abs(body.dy)
         sign = Math.sign(body.dy)
 
-        for (let di = 1/nb; di <= dy; di+= 1/nb) {
+        for (let di = ni; di <= dy; di+= ni) {
           if (grid.is_solid_xywh(body, 0, sign * di * Time.delta)) {
             body.dy = 0
             break
@@ -66,6 +91,7 @@ abstract class LevelP extends Play {
             body.y += sign * di * Time.delta
           }
         }
+
       }
     })
   }
@@ -686,7 +712,9 @@ class Level1 extends LevelP {
     let p1 = this.world.body(Player, {
       name: `player`,
       x: 8,
-      y: 8,
+      y: 16,
+      w: 16,
+      h: 16,
       s_origin: 'bc'
     })
 

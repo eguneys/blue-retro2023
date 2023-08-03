@@ -30,7 +30,7 @@ export default defineConfig({
         properties: {
           //debug: true,
           keep_quoted: 'strict',
-          reserved: [...['make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline', 'seconds', 'hex', 'css', 'h', 'lerp', '_music_onoff'], ...colors]
+          reserved: [...['from_code', 'cluster', 'make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline', 'seconds', 'hex', 'css', 'h', 'lerp', '_music_onoff'], ...colors]
         }
       }
     },

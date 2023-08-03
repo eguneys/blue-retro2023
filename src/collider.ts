@@ -205,15 +205,17 @@ export class GridCollider {
   is_solid_xywh(xywh: XYWH, dx: number, dy: number) {
     let { x, y, w, h } = xywh
 
-    return this.is_solid_rect(x + dx, y + dy, w, h)
+    let hw = w / 2
+
+    return this.is_solid_rect(x - hw + dx, y - h + dy, w, h)
   }
 
   is_solid_rect(x: number, y: number, w = 1, h = 1) {
 
-    let grid_x = Math.floor(x / cell_size)
-    let grid_y = Math.floor(y / cell_size)
-    let grid_end_x = Math.floor((x + w - 1) / cell_size)
-    let grid_end_y = Math.floor((y + h - 1) / cell_size)
+    let grid_x = (x / cell_size)
+    let grid_y = (y / cell_size)
+    let grid_end_x = ((x + w - 1) / cell_size)
+    let grid_end_y = ((y + h - 1) / cell_size)
 
     if (grid_x < 0 || grid_end_x >= grid_width || grid_y < 0 || grid_end_y >= grid_height) {
       throw `outbounds ${x} ${y}`
@@ -222,6 +224,8 @@ export class GridCollider {
     // overuse x y
     for (x = grid_x; x <= grid_end_x; x++) {
       for (y = grid_y; y <= grid_end_y; y++) {
+        x = Math.floor(x)
+        y = Math.floor(y)
         if (this.grid[x][y].solid) {
           return true
         }
