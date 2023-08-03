@@ -88,7 +88,7 @@ const solid_auto_tiles: Record<NeighborsMask, XY> = {
   [ulrd(SOLID, OUT_OF_BOUNDS, SOLID, OUT_OF_BOUNDS)]: [3, 2],
 }
 
-console.log(ulrd(AIR, SOLID, SOLID, AIR))
+//console.log(ulrd(AIR, SOLID, SOLID, AIR))
 
 const neighbors_auto_tiles: Record<Cluster, Record<NeighborsMask, XY>> = {
   [SOLID]: solid_auto_tiles,
