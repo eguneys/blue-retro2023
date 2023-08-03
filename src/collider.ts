@@ -207,7 +207,11 @@ export class GridCollider {
 
     let hw = w / 2
 
+    try {
     return this.is_solid_rect(x - hw + dx, y - h + dy, w, h)
+    } catch (_) {
+      return true
+    }
   }
 
   is_solid_rect(x: number, y: number, w = 1, h = 1) {

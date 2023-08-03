@@ -5,7 +5,7 @@ import Input from './input'
 import Graphics from './graphics'
 import Sound from './sound'
 import { cell_size, PhCollider } from './collider'
-import { arr_rnd } from './random'
+import { random, arr_rnd } from './random'
 import { rect_vs_point } from './rect'
 import { Progress } from './code'
 
@@ -19,8 +19,8 @@ const max_nb = 3
 const small_epsilon = 1e-5
 const epsilon = 1
 const max_dx = 2.58002
-const G = 4.1812
-const max_dy = 1.3 * G
+const _G = 4.1812
+const max_dy = 1.3 * _G
 const jump_dy = max_dy
 const jump_max_accel_y = 0.044311
 const fall_max_accel_y = 0.877
@@ -35,9 +35,8 @@ abstract class LevelP extends Play {
     this.world = this.make(PhWorld)
     this.solid = this.make(PhCollider)
 
-    this._init()
 
-    return this
+    return super.init()
   }
 
 
@@ -46,7 +45,7 @@ abstract class LevelP extends Play {
     let { grid } = this.solid
     let { bodies } = this.world
 
-    // 2 pixel perfect collision detection
+    // 1 pixel perfect collision detection
     bodies.forEach(body => {
 
       let nb = max_nb
@@ -74,6 +73,7 @@ abstract class LevelP extends Play {
           }
         }
 
+        let G = _G * body._scale_G
         let decrease_g = 0
         {
 
@@ -146,6 +146,14 @@ abstract class PhBody extends Play {
     this.world._switch(this, ctor, data)
   }
 
+
+  _scale_G!: number
+
+  variance!: number
+
+  lerp_x?: [number, number, number]
+  lerp_y?: [number, number, number]
+
   public world!: PhWorld
 
   public collide_v!: number
@@ -195,7 +203,41 @@ abstract class PhBody extends Play {
     this.dx = 0
     this.dy = 0
 
+    this._scale_G = this.data.scale_G ?? 1
+    this.variance = max_variance
+
+    this.lerp_x = undefined
+    this.lerp_y = undefined
+
     return super.init()
+  }
+
+
+  update() {
+
+    if (this.lerp_x) {
+      let [to, dur, left] = this.lerp_x
+
+      if (left <= small_epsilon) {
+        this.lerp_x = undefined
+      } else {
+        this.dx = this.dx + (to - this.dx) * (1 - left / dur)
+        this.lerp_x[2] -= Time.delta
+      }
+    }
+
+    if (this.lerp_y) {
+      let [to, dur, left] = this.lerp_y
+
+      if (left <= small_epsilon) {
+        this.lerp_y = undefined
+      } else {
+        this.dy = this.dy + (to - this.dy) * (1 - left / dur)
+        this.lerp_y[2] -= Time.delta
+      }
+    }
+
+    super.update()
   }
 }
 
@@ -250,10 +292,31 @@ abstract class PhBodyAnim extends PhBody {
   }
 }
 
+const max_variance = 0.6234
+let nf_x = 3.222
+let nf_y = 3.323
+
+function brown(n: number, variance: number) {
+  let min = -n
+  let max = +n
+  return (random() * (max - min) + min) * variance
+}
 
 class Fly extends PhBodyAnim {
 
   _update() {
+
+    let { variance } = this
+
+    if (Time.on_interval(0.1764)) {
+      let nx = brown(nf_x, variance)
+      this.lerp_x = [nx, 0.2, 0.2]
+    }
+
+    if (Time.on_interval(0.242)) {
+      let ny = brown(nf_y, variance)
+      this.lerp_y = [ny, 0.2, 0.2]
+    }
   }
 
 }
@@ -278,7 +341,6 @@ class Player extends PhBodyAnim {
       }
     }
   }
-
 }
 
 type RectPlayData = {
@@ -788,15 +850,28 @@ class Level1 extends LevelP {
 
   _init() {
 
-
-    let f1 = this.world.body(Fly, {
+    let f2 = this.world.body(Fly, {
       name: `fly`,
-      x: 30,
+      x: 190,
       y: 30,
       w: 16,
       h: 16,
+      scale_G: 0.06,
       s_origin: 'bc'
     })
+
+
+
+    let f1 = this.world.body(Fly, {
+      name: `fly`,
+      x: 60,
+      y: 60,
+      w: 16,
+      h: 16,
+      scale_G: 0.03,
+      s_origin: 'bc'
+    })
+
 
     let p1 = this.world.body(Player, {
       name: `player`,
@@ -806,6 +881,9 @@ class Level1 extends LevelP {
       h: 16,
       s_origin: 'bc'
     })
+
+
+
   }
 
 }
