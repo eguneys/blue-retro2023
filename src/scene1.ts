@@ -202,9 +202,6 @@ class PhWorld extends Play {
   body<T extends PhBody>(ctor: { new (): T }, data: any = {}) {
     return this.make(ctor, data)
   }
-
-  _update() {
-  }
 }
 
 type PhBodyAnimData = AnimData & PhBodyData
@@ -232,6 +229,13 @@ abstract class PhBodyAnim extends PhBody {
   }
 }
 
+
+class Fly extends PhBodyAnim {
+
+  _update() {
+  }
+
+}
 
 class Player extends PhBodyAnim {
 
@@ -762,6 +766,17 @@ class Text extends Play {
 class Level1 extends LevelP {
 
   _init() {
+
+
+    let f1 = this.world.body(Fly, {
+      name: `fly`,
+      x: 30,
+      y: 30,
+      w: 16,
+      h: 16,
+      s_origin: 'bc'
+    })
+
     let p1 = this.world.body(Player, {
       name: `player`,
       x: 8,
@@ -770,8 +785,6 @@ class Level1 extends LevelP {
       h: 16,
       s_origin: 'bc'
     })
-
-    p1.dy = 4
   }
 
 }

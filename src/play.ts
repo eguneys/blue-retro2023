@@ -136,7 +136,7 @@ export class Anim extends Play {
   }
 
   private get info() {
-    let res = Content.info.find(_ => _.name)
+    let res = Content.info.find(_ => _.name === this._name)
     if (!res) {
       throw `nosprite ${this._name}`
     }
