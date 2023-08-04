@@ -51,10 +51,16 @@ class Input {
       'jump': ActionListener.make(),
       'left': ActionListener.make(),
       'right': ActionListener.make(),
-      'down': ActionListener.make()
+      'down': ActionListener.make(),
+      'pickup': ActionListener.make(),
+      'music': ActionListener.make()
     }
 
     this.key_map = {
+      'i': 'jump',
+      'j': 'left',
+      'k': 'down',
+      'l': 'right',
       'w': 'jump',
       'a': 'left',
       's': 'down',
@@ -63,6 +69,10 @@ class Input {
       'ArrowLeft': 'left',
       'ArrowDown': 'down',
       'ArrowRight': 'right',
+      'x': 'pickup',
+      'c': 'pickup',
+      'Space': 'pickup',
+      'm': 'music'
     }
     document.addEventListener('keydown', e =>
       this.action_map[this.key_map[e.key]]?.act('down')
