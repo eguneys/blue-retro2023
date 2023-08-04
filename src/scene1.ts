@@ -144,7 +144,7 @@ abstract class PhBody extends Play {
 
 
   switch<T extends PhBody>(ctor: { new (): T }, data: any = {}) {
-    this.world._switch(this, ctor, data)
+    return this.world._switch(this, ctor, data)
   }
 
 
@@ -303,6 +303,14 @@ function brown(n: number = 1, variance: number = max_variance) {
   return (random() * (max - min) + min) * variance
 }
 
+function ubrown(n: number, variance = max_variance) {
+  return Math.floor(n / 2 + brown(n / 2, variance) + 1)
+}
+
+function ibrown(n: number, variance = max_variance) {
+  return n / 2 + brown(n / 2, variance)
+}
+
 class Fly extends PhBodyAnim {
 
   _update() {
@@ -322,9 +330,8 @@ class Fly extends PhBodyAnim {
 
 }
 
-class Dust extends PhBodyAnim {
-
-}
+class Dust extends PhBodyAnim {}
+class Ghoul extends PhBodyAnim {}
 
 class Player extends PhBodyAnim {
 
@@ -867,21 +874,6 @@ class Text extends Play {
   }
 }
 
-class AutoGenDecoration extends Play {
-
-  _init() {
-    for (let i = 0; i < 16 + brown(8); i++) {
-      let d = this.make(Anim, {
-        name: 'dust',
-        tag: 's'
-      })
-      d.xy(90 + brown(320), brown(180))
-    }
-  }
-
-}
-
-
 type BouncePData = {
   x: number,
   y: number
@@ -905,34 +897,74 @@ class BounceP extends Play {
 
 
 
+
+class AutoGenDecoration extends Play {
+
+  _init() {
+    for (let i = 0; i < 16 + brown(8); i++) {
+      let d = this.make(Anim, {
+        name: 'dust',
+        tag: 's'
+      })
+      d.xy(90 + brown(320), brown(180))
+    }
+  }
+
+}
+
+type GenPickupsData = {
+  world: PhWorld
+}
+
+class AutoGenPickups extends Play {
+
+  get data() {
+    return this._data as GenPickupsData
+  }
+  
+  world!: PhWorld
+
+  ones!: PhBody[]
+
+  _init() {
+
+    this.world = this.data.world
+
+    this.ones = []
+  }
+
+  _update() {
+
+    if (Time.on_interval(ubrown(ubrown(3.2) + 1))) {
+      let ctor = Fly
+      let data = {
+        name: `fly`,
+        x: 60 + ubrown(190),
+        y: 30 + ubrown(60),
+        w: 16,
+        h: 16,
+        scale_G: 0.03 + ibrown(0.3),
+        s_origin: 'bc'
+      }
+
+      if (this.ones.length < 2 || this.ones.length < ubrown(2 + ubrown(6))) {
+        this.ones.push(this.world.body(ctor, data))
+      } else {
+        let o = this.ones.shift()
+        this.ones.push(o.switch(ctor, data))
+      }
+    }
+  }
+
+}
+
 class Level1 extends LevelP {
 
   _init() {
 
     this.make(AutoGenDecoration)
 
-    let f2 = this.world.body(Fly, {
-      name: `fly`,
-      x: 190,
-      y: 30,
-      w: 16,
-      h: 16,
-      scale_G: 0.06,
-      s_origin: 'bc'
-    })
-
-
-
-    let f1 = this.world.body(Fly, {
-      name: `fly`,
-      x: 60,
-      y: 60,
-      w: 16,
-      h: 16,
-      scale_G: 0.03,
-      s_origin: 'bc'
-    })
-
+    this.make(AutoGenPickups, { world: this.world })
 
     let p1 = this.world.body(Player, {
       name: `player`,
