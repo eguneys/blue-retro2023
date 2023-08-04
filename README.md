@@ -14,14 +14,6 @@ You can either manually control the player, or use buttons at the top right to a
     - xc or Space for pickup
     - m for toggle music
 
-  Controls:
-
-    - wasd or ijkl or Arrows for movement
-    - xc or Space for pickup
-    - m for toggle music
-
-You can either manually control the player, or use buttons at the top right to automate the process. Hold pickup to pickup things and put them in your box to collect points. Highest points will be given a secret code and shared at the end of the jam. You have 2 minutes, enjoy.
-
 ## Tips
 
 Use magic ratios like these to increase juice `0.86543` instead of dry numbers like `0.7` or 500.
