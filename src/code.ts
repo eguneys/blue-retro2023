@@ -18,7 +18,7 @@ export class Progress {
   }
 
 
-  time_left = 3
+  time_left = 30
   time_begin = false
 
   get last_ten() {

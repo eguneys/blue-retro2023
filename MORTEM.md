@@ -4,7 +4,7 @@ I made a game for JS13k called Blue Retro, which you can play [here]().
 
 Here's what it looks like:
 
-![blue retro js13k]().
+![Blue Retro](blue-retro2023.gif).
 
 Let me tell you it's story.
 

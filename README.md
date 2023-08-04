@@ -1,5 +1,7 @@
 # Blue Retro 2023
 
+![Blue Retro](blue-retro2023.gif).
+
 An idle clicker game where you try to please the character playing a platformer game.
 
 Character will give you clues to what it wants. 
