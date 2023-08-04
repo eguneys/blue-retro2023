@@ -10,6 +10,12 @@ You play with mouse, no touch controls are enabled. You can also use arrow keys 
 
 Have a Happy day.
 
+  Controls:
+
+    - wasd or ijkl or arrows for movement
+    - xc or Space for pickup
+    - m for toggle music
+
 ## Tips
 
 Use magic ratios like these to increase juice `0.86543` instead of dry numbers like `0.7`.

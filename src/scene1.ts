@@ -604,6 +604,12 @@ class Hud extends Play {
 
   _update() {
 
+
+    if (Input.btnp('music')) {
+      Sound.music_onoff = !Sound.music_onoff
+      this.update_sound_text()
+    }
+
     this.align.forEach(align => {
       let margin = align.margin ?? 0
 
@@ -950,8 +956,10 @@ class AutoGenPickups extends Play {
       if (this.ones.length < 2 || this.ones.length < ubrown(2 + ubrown(6))) {
         this.ones.push(this.world.body(ctor, data))
       } else {
-        let o = this.ones.shift()
-        this.ones.push(o.switch(ctor, data))
+        let o = this.ones.shift()!
+        if (o) {
+          this.ones.push(o.switch(ctor, data))
+        }
       }
     }
   }
