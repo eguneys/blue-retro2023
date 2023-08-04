@@ -13,6 +13,14 @@ function distance(x: number, y: number, a: number, b: number) {
   return Math.abs(Math.sqrt(x * x + y * y) - Math.sqrt(a * a + b * b))
 }
 
+function time_format(n: number) {
+  function left_pad(n: number) {
+    return n < 10 ? `0${n}`:`${n}`
+  }
+
+  return `${left_pad(Math.floor(n / 60))}:${left_pad(Math.floor(n%60))}`
+}
+
 const l2h_x = (x: number) => x / 320 * 1920
 const l2h_y = (y: number) => y / 180 * 1080
 const h2l_x = (x: number) => x / 1920 * 320
@@ -383,9 +391,6 @@ class Fly extends Pickable {
       this.lerp_y = [this.y + ny, 0.2, 0.2]
     }
 
-    if (Time.on_interval(6)) {
-      Sound.fx('nbuzz')
-    }
   }
 
 }
@@ -441,7 +446,9 @@ class Player extends PhBodyAnim {
       } else {
         this._pickup = this.find_pickup(Fly) || this.find_pickup(Ghoul)
         if (this._pickup) {
+          Sound.fx('open')
           this._pickup.picked = this
+          progress.time_begin = true
         }
       }
     }
@@ -625,6 +632,8 @@ class Hud extends Play {
   music_text!: Text
   music_ontext!: Text
 
+  time_text!: Text
+
   _init() {
 
     this.align = []
@@ -659,8 +668,11 @@ class Hud extends Play {
       h: [this.blue_text, this.retro_text]
     })
 
+    this.make(Text, { x: 50, y: 170, size: 54, text: 'time' })
 
-    this.make(CText, { x: 50, y: 170, size: 54, text: '1 undescent' })
+    this.time_text =
+      this.make(CText, { x: 280, y: 170, size: 54, text: '02:00' })
+
     this.music_text = this.make(Text, { x: 50, y: 228, size: 54, text: 'music' })
     this.music_ontext = this.make(Text, { x: 280, y: 228, size: 54, text: 'on' })
 
@@ -694,6 +706,11 @@ class Hud extends Play {
 
   _update() {
 
+    if (progress.last_ten) {
+      
+    }
+
+    this.time_text.text = time_format(progress.time_left)
 
     if (Input.btnp('music')) {
       Sound.music_onoff = !Sound.music_onoff
@@ -732,12 +749,15 @@ abstract class Scene extends Play {
 }
 
 class GamePlayScene extends Scene {
+
+  _countdown!: number
+
   _init() {
+    this._countdown = 0
 
     Sound.music('intro')
 
     this.make(Level1)
-
     let self = this
     this.make(Hud, {
       on_credits() {
@@ -745,9 +765,36 @@ class GamePlayScene extends Scene {
       }
     })
   }
+
+  _update() {
+    progress.update()
+    if (progress.times_up) {
+      this.make(GamePlayEndNotification)
+      if (this._countdown === 0) {
+        this._countdown = 5.432
+      }
+    }
+    if (this._countdown > 0) {
+
+      this._countdown-= Time.delta
+      if (this._countdown <= 0) {
+        this.switch_scene(CreditsScene)
+      }
+    }
+  }
 }
 
-const progress = Progress.make()
+class GamePlayEndNotification extends Play {
+
+  _init() {
+    this.make(Text, { x: 1920/2, y: 1080/2, size: 123, text: 'good game ὄ'})
+    this.make(Text, { x: 1920/2, y: 1080/2 + 72, size: 43, text: 'every thing just never asks'})
+    this.make(Text, { x: 1920/2, y: 1080/2 + 102, size: 43, text: '.', color: Color.darkpurple })
+  }
+
+}
+
+let progress = Progress.make()
 
 class CreditsScene extends Scene {
 
@@ -755,7 +802,13 @@ class CreditsScene extends Scene {
 
   code_text!: Text
 
+  last_progress!: Progress
+
   _init() {
+
+    this.last_progress = progress
+    progress = Progress.make()
+
     Sound.music_onoff = false
 
     this.make(RectPlay, { color: Color.green, x: 0, y: 0, w: 320, h: 180 })
@@ -804,7 +857,7 @@ class CreditsScene extends Scene {
 
     this.texts[0].y += Time.delta * 200
     if (this.texts[0].y > this.texts.length * 1080 - 100) {
-      this.code_text.text = this.code_text.text.replace('wait_x2_not', progress.code)
+      this.code_text.text = this.code_text.text.replace('wait_x2_not', this.last_progress.code)
     }
     this.texts[0].y %= this.texts.length * 1080 - 100
     this.texts.reduce((pre, next) => { 
@@ -877,8 +930,8 @@ export default class Scene1 extends Scene {
   }
 
   _init() {
-    //this.add_scene(StartScene1)
-    this.add_scene(GamePlayScene)
+    this.add_scene(StartScene1)
+    //this.add_scene(GamePlayScene)
   }
 
   _pre_draw(g: Graphics, t: Graphics) {

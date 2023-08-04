@@ -1,3 +1,5 @@
+import Time from './time'
+
 export class Progress {
 
   static make = () => new Progress()
@@ -13,6 +15,27 @@ export class Progress {
 
   get rank() {
     return 0
+  }
+
+
+  time_left = 3
+  time_begin = false
+
+  get last_ten() {
+    return this.time_left <= 13
+  }
+
+  get times_up() {
+    return this.time_left === 0
+  }
+
+  update() {
+    if (this.time_begin) {
+      this.time_left -= Time.delta
+      if (this.time_left < 0) {
+        this.time_left = 0
+      }
+    }
   }
 }
 
