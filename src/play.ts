@@ -25,6 +25,7 @@ export default abstract class Play {
 
   life!: number
   objects: Play[]
+  pools: [Play, number][]
 
   _mouses: Map<RectKey, MouseHandler>
 
@@ -36,6 +37,7 @@ export default abstract class Play {
 
 
   constructor() {
+    this.pools = []
     this.objects = []
     this._mouses = new Map()
   }
@@ -51,12 +53,26 @@ export default abstract class Play {
     return res
   }
 
+  pool<T extends Play>(ctor: { new (): T }, data: any = {}, n = 7) {
+    let res = this._make(ctor, data)
+    this.objects.push(res)
+    this.pools.push([res, n])
+
+    return res
+  }
+
   remove(p: Play) {
     let i = this.objects.indexOf(p)
     if (i === -1) {
       throw 'noscene rm'
     }
     this.objects.splice(i, 1)
+
+    i = this.pools.findIndex(([o]) => o === p)
+    if (i !== -1) {
+      this.pools.splice(i, 1)
+    }
+
   }
 
   init() {
@@ -73,6 +89,16 @@ export default abstract class Play {
     }
     this.objects.forEach(_ => _.update())
     this.life += Time.delta
+
+    this.pools.slice(0).forEach(([o, l]) => {
+      let ls = this.pools.filter(_ => _[0].constructor.name === o.constructor.name)
+
+      if (ls.length > l) {
+        let o = ls[0][0]
+        this.remove(o)
+      }
+    })
+
 
     if (Mouse.click) {
       let x = Mouse.click[0] * 320

@@ -132,7 +132,8 @@ type PhBodyData = {
   x?: number,
   y?: number,
   w: number,
-  h: number
+  h: number,
+  scale_G?: number
 }
 
 abstract class PhBody extends Play {
@@ -296,7 +297,7 @@ const max_variance = 0.6234
 let nf_x = 3.222
 let nf_y = 3.323
 
-function brown(n: number, variance: number) {
+function brown(n: number = 1, variance: number = max_variance) {
   let min = -n
   let max = +n
   return (random() * (max - min) + min) * variance
@@ -321,9 +322,29 @@ class Fly extends PhBodyAnim {
 
 }
 
+class Dust extends PhBodyAnim {
+
+}
+
 class Player extends PhBodyAnim {
 
+  _pre_grounded = false
+
+  get facing() {
+    return this.anim.scale_x
+  }
+
   _update() {
+    
+    if (this.grounded && (Time.on_interval(brown(3)) || !this._pre_grounded)) {
+
+      this.pool(BounceP, {
+        x: this.x - 8 * this.facing,
+        y: this.y - 8
+      }, 4)
+    }
+
+    this._pre_grounded = this.grounded
 
     if (Input.btn('left')) {
       this.anim.scale_x = -1
@@ -846,9 +867,49 @@ class Text extends Play {
   }
 }
 
+class AutoGenDecoration extends Play {
+
+  _init() {
+    for (let i = 0; i < 16 + brown(8); i++) {
+      let d = this.make(Anim, {
+        name: 'dust',
+        tag: 's'
+      })
+      d.xy(90 + brown(320), brown(180))
+    }
+  }
+
+}
+
+
+type BouncePData = {
+  x: number,
+  y: number
+}
+class BounceP extends Play {
+
+  get data() {
+    return this._data as BouncePData
+  }
+
+
+  _init() {
+    let _ = this.make(Anim, {
+      name: 'bounce',
+      tag: `${5 + Math.floor(brown(4))}`
+    })
+    _.xy(this.data.x, this.data.y)
+  }
+
+}
+
+
+
 class Level1 extends LevelP {
 
   _init() {
+
+    this.make(AutoGenDecoration)
 
     let f2 = this.world.body(Fly, {
       name: `fly`,
