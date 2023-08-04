@@ -9,6 +9,10 @@ import { random, arr_rnd } from './random'
 import { rect_vs_point } from './rect'
 import { Progress } from './code'
 
+function distance(x: number, y: number, a: number, b: number) {
+  return Math.abs(Math.sqrt(x * x + y * y) - Math.sqrt(a * a + b * b))
+}
+
 const l2h_x = (x: number) => x / 320 * 1920
 const l2h_y = (y: number) => y / 180 * 1080
 const h2l_x = (x: number) => x / 1920 * 320
@@ -144,7 +148,7 @@ abstract class PhBody extends Play {
 
 
   switch<T extends PhBody>(ctor: { new (): T }, data: any = {}) {
-    return this.world._switch(this, ctor, data)
+    return this.world?._switch(this, ctor, data)
   }
 
 
@@ -155,7 +159,7 @@ abstract class PhBody extends Play {
   lerp_x?: [number, number, number]
   lerp_y?: [number, number, number]
 
-  public world!: PhWorld
+  public world?: PhWorld
 
   public collide_v!: number
   public collide_h!: number
@@ -222,7 +226,7 @@ abstract class PhBody extends Play {
       if (left <= small_epsilon) {
         this.lerp_x = undefined
       } else {
-        this.dx = this.dx + (to - this.dx) * (1 - left / dur)
+        this.x = this.x + (to - this.x) * (1 - left / dur)
         this.lerp_x[2] -= Time.delta
       }
     }
@@ -233,7 +237,7 @@ abstract class PhBody extends Play {
       if (left <= small_epsilon) {
         this.lerp_y = undefined
       } else {
-        this.dy = this.dy + (to - this.dy) * (1 - left / dur)
+        this.y = this.y + (to - this.y) * (1 - left / dur)
         this.lerp_y[2] -= Time.delta
       }
     }
@@ -262,8 +266,13 @@ class PhWorld extends Play {
       throw 'nobody'
     }
     this.bodies.splice(i, 1)
+    old.world = undefined
 
     return this.body(ctor, data)
+  }
+
+  filter<T extends PhBody>(ctor: { new (): T }) {
+    return this.bodies.filter(_ => _.constructor.name === ctor.name)
   }
 
 }
@@ -294,8 +303,8 @@ abstract class PhBodyAnim extends PhBody {
 }
 
 const max_variance = 0.6234
-let nf_x = 3.222
-let nf_y = 3.323
+let nf_x = 6.222
+let nf_y = 6.323
 
 function brown(n: number = 1, variance: number = max_variance) {
   let min = -n
@@ -311,34 +320,89 @@ function ibrown(n: number, variance = max_variance) {
   return n / 2 + brown(n / 2, variance)
 }
 
-class Fly extends PhBodyAnim {
+class Pickable extends PhBodyAnim {
+
+  picked?: Player
+
+  update() {
+
+    let { picked } = this
+
+    if (picked) {
+
+      if (Time.on_interval(0.2)) {
+        this.pool(Zzz, { x: this.x, y: this.y - 8 })
+        this.lerp_x = [picked.x, 0.3, 0.3]
+        this.lerp_y = [picked.y, 0.3, 0.3]
+      }
+    }
+
+    super.update()
+  }
+}
+
+class Zzz extends PhBody {
+
+  text!: string
+  color!: Color
+  size!: number
+
+  _init() {
+    this.text = ubrown(6) < 3 ? 'z' : 'Z'
+    this.color = arr_rnd(Color.all)
+    this.size = 52 + ubrown(32)
+  }
 
   _update() {
+    this.y -= 1/2 * _G * Math.sqrt(Time.delta)
+    this.x += brown(nf_x, 0.1)
+  }
+
+  _draw(g: Graphics, t: Graphics) {
+    t.str(this.text, l2h_x(this.x), l2h_y(this.y), this.size, this.color)
+  }
+}
+
+class Fly extends Pickable {
+
+  _update() {
+
+    if (this.picked) {
+      return
+    }
 
     let { variance } = this
 
     if (Time.on_interval(0.1764)) {
       let nx = brown(nf_x, variance)
-      this.lerp_x = [nx, 0.2, 0.2]
+      this.lerp_x = [this.x + nx, 0.2, 0.2]
     }
 
     if (Time.on_interval(0.242)) {
       let ny = brown(nf_y, variance)
-      this.lerp_y = [ny, 0.2, 0.2]
+      this.lerp_y = [this.y + ny, 0.2, 0.2]
+    }
+
+    if (Time.on_interval(6)) {
+      Sound.fx('nbuzz')
     }
   }
 
 }
 
 class Dust extends PhBodyAnim {}
-class Ghoul extends PhBodyAnim {}
+class Ghoul extends Pickable {}
 
 class Player extends PhBodyAnim {
 
+  _pickup?: Pickable
   _pre_grounded = false
 
   get facing() {
     return this.anim.scale_x
+  }
+
+  _first_update() {
   }
 
   _update() {
@@ -368,6 +432,32 @@ class Player extends PhBodyAnim {
         this.dy = -jump_dy
       }
     }
+
+
+    if (Input.btnp('pickup')) {
+      if (this._pickup) {
+        this._pickup.picked = undefined
+        this._pickup = undefined
+      } else {
+        this._pickup = this.find_pickup(Fly) || this.find_pickup(Ghoul)
+        if (this._pickup) {
+          this._pickup.picked = this
+        }
+      }
+    }
+  }
+
+  find_pickup<T extends Pickable>(ctor: { new (): T }) {
+    let { x, y } = this
+
+    let res = this.world?.filter(ctor)
+    .map<[Pickable, number]>(_ => [_ as Pickable, distance(_.x, _.y, x, y)])
+    .sort((a, b) => a[1] - b[1])[0]
+
+    if (res && res[1] < 10) {
+      return res[0]
+    }
+
   }
 }
 
@@ -645,7 +735,6 @@ class GamePlayScene extends Scene {
   _init() {
 
     Sound.music('intro')
-    Sound.fx('open')
 
     this.make(Level1)
 
@@ -788,8 +877,8 @@ export default class Scene1 extends Scene {
   }
 
   _init() {
-    this.add_scene(StartScene1)
-    //this.add_scene(GamePlayScene)
+    //this.add_scene(StartScene1)
+    this.add_scene(GamePlayScene)
   }
 
   _pre_draw(g: Graphics, t: Graphics) {
@@ -933,6 +1022,30 @@ class AutoGenDecoration extends Play {
 
 }
 
+
+function gen_pickup() {
+  return arr_rnd([
+    [Fly, {
+      name: `fly`,
+      x: 60 + ubrown(190),
+      y: 30 + ubrown(60),
+      w: 16,
+      h: 16,
+      scale_G: 0.03 + ibrown(0.3),
+      s_origin: 'bc'
+    }], [Ghoul, {
+      name: `ghoul`,
+      x: ubrown(320),
+      y: 130,
+      w: 16,
+      h: 16,
+      scale_G: 0.03 + ibrown(0.3),
+      s_origin: 'bc'
+
+    }]
+  ])
+}
+
 type GenPickupsData = {
   world: PhWorld
 }
@@ -945,7 +1058,7 @@ class AutoGenPickups extends Play {
   
   world!: PhWorld
 
-  ones!: PhBody[]
+  ones!: Pickable[]
 
   _init() {
 
@@ -957,23 +1070,17 @@ class AutoGenPickups extends Play {
   _update() {
 
     if (Time.on_interval(ubrown(ubrown(3.2) + 1))) {
-      let ctor = Fly
-      let data = {
-        name: `fly`,
-        x: 60 + ubrown(190),
-        y: 30 + ubrown(60),
-        w: 16,
-        h: 16,
-        scale_G: 0.03 + ibrown(0.3),
-        s_origin: 'bc'
-      }
+      let [ctor, data]: any = gen_pickup()
 
       if (this.ones.length < 2 || this.ones.length < ubrown(2 + ubrown(6))) {
         this.ones.push(this.world.body(ctor, data))
       } else {
         let o = this.ones.shift()!
         if (o) {
-          this.ones.push(o.switch(ctor, data))
+          if (o.picked) {
+          } else {
+            this.ones.push(o.switch(ctor, data)!)
+          }
         }
       }
     }
@@ -985,8 +1092,8 @@ class Level1 extends LevelP {
 
   _init() {
 
-    this.make(AutoGenDecoration)
 
+    this.make(AutoGenDecoration)
     this.make(AutoGenPickups, { world: this.world })
 
     let p1 = this.world.body(Player, {
