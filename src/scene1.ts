@@ -681,6 +681,8 @@ class CreditsScene extends Scene {
       this.make(Text, { color: Color.darkpurple, x, y: 100, size: 90, text: 'thanks for playing' }),
 
       this.code_text,
+
+      this.make(Text, { color: Color.darkpurple, x, y: 100, size: 38, text: 'press jump or pickup to pause' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'art twitter.com/_V3X3D' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'music github.com/arikwex' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'author twitter.com/eguneys' }),
@@ -692,12 +694,24 @@ class CreditsScene extends Scene {
     let self = this
     this.add_mouse(0, 0, 320, 180, {
       on_click() {
-        self.switch_scene(StartScene1)
+        if (self.life > 2) {
+          self.switch_scene(StartScene1)
+        }
       }
     })
   }
 
+  _hold = false
+
   _update() {
+
+    if (Input.btnp('jump') || Input.btnp('pickup')) {
+      this._hold = !this._hold
+    }
+    if (this._hold) {
+      return
+    }
+
     this.texts[0].y += Time.delta * 200
     if (this.texts[0].y > this.texts.length * 1080 - 100) {
       this.code_text.text = this.code_text.text.replace('wait_x2_not', progress.code)

@@ -71,7 +71,7 @@ class Input {
       'ArrowRight': 'right',
       'x': 'pickup',
       'c': 'pickup',
-      'Space': 'pickup',
+      ' ': 'pickup',
       'm': 'music'
     }
     document.addEventListener('keydown', e =>
