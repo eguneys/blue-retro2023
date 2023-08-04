@@ -2,6 +2,18 @@
 
 An idle clicker game where you try to please the character playing a platformer game.
 
+Character will give you clues to what it wants. 
+
+There may or may not be a secret code which you can tweet me so I know you actually finished the game.
+
+You can either manually control the player, or use buttons at the top right to automate the process. Hold pickup to pickup things and put them in your box to collect points. Highest points will be given a secret code and shared at the end of the jam. You have 2 minutes, enjoy.
+
+  Controls:
+
+    - wasd or ijkl or Arrows for movement
+    - xc or Space for pickup
+    - m for toggle music
+
 ## Tips
 
 Use magic ratios like these to increase juice `0.86543` instead of dry numbers like `0.7` or 500.
@@ -29,6 +41,8 @@ aseprite files go into `assets/sprites` folder. `out_0.png` files built into `as
 - [normal numbers](https://chat.openai.com/share/6b1f9b25-7922-4a01-b10c-a8e1f18ee27a)
 - [smart fly movement](https://chat.openai.com/share/27f6085e-3911-4944-b805-580f9aeb007a)
 - [simpler perlin noise](https://chat.openai.com/share/37a84a0b-9180-48df-9e2f-e49fb887a5bd)
+- [have a happy day too](https://chat.openai.com/share/9e8b39b4-23fb-41f6-82c7-5b3c42c09dcb)
+- [normal numbers](https://chat.openai.com/share/fdf4ffef-13ac-4e6c-9ba6-4d3915e7184d)
 - [blending canvas 2d](https://chat.openai.com/share/9f0fbf85-231c-4c08-a912-4457e9c5f0b7)
 - [input handling 2d platformer](https://chat.openai.com/share/e35a861b-0d02-4f28-897f-d1afb5a6b95e)
 - [audio synthesis from infernal throne previous js13k entry](https://chat.openai.com/share/957a3f2c-2d05-4ed2-885c-3c8af7c7caf9), another link, [releated issue](https://github.com/arikwex/infernal-sigil/issues/2)
