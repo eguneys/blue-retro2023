@@ -2,21 +2,17 @@
 
 An idle clicker game where you try to please the character playing a platformer game.
 
-Character will give you clues to what it wants, you try to adjust the level design to it's needs to gain points.
+Character will give you clues to what it wants. 
 
 There may or may not be a secret code which you can tweet me so I know you actually finished the game.
 
-You play with mouse, no touch controls are enabled. You can also use arrow keys or wasd to actually control the player.
-
-Have a Happy day.
+You can either manually control the player, or use buttons at the top right to automate the process. Hold pickup to pickup things and put them in your box to collect points. Highest points will be given a secret code and shared at the end of the jam. You have 2 minutes, enjoy.
 
   Controls:
 
     - wasd or ijkl or Arrows for movement
     - xc or Space for pickup
     - m for toggle music
-
-You can either manually control the player, or use buttons at the top right to automate the process. Hold pickup to pickup things and put them in your box to collect points. Highest points will be given a secret code and shared at the end of the jam. You have 2 minutes, enjoy.
 
 ## Tips
 
