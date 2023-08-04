@@ -645,6 +645,7 @@ class GamePlayScene extends Scene {
   _init() {
 
     Sound.music('intro')
+    Sound.fx('open')
 
     this.make(Level1)
 
@@ -751,7 +752,7 @@ class StartScene1 extends Scene {
     this.begin_text2 = this.make(Text, { x: 0, y: 1030, size: 62, text: 'click to begin', color: Color.light })
 
     Sound.load(p => { 
-      let text = p === 1 ? `click to begin` : `loading sounds ${p * 100}%`
+      let text = p === 1 ? `click to begin` : `loading sounds ${Math.floor(p * 100)}%`
       this.begin_text1.text = text
       this.begin_text2.text = text
       console.log(text)
@@ -787,8 +788,8 @@ export default class Scene1 extends Scene {
   }
 
   _init() {
-    //this.add_scene(StartScene1)
-    this.add_scene(GamePlayScene)
+    this.add_scene(StartScene1)
+    //this.add_scene(GamePlayScene)
   }
 
   _pre_draw(g: Graphics, t: Graphics) {

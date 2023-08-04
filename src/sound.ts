@@ -8,13 +8,16 @@ const EVENT_FOCUS = 'on_focus'
 const EVENT_FOCUS_STOP = 'on_focus_stop'
 
 
-type SoundData = [string, number, (_: number) => number]
+type Wave = (_: number) => number
+type SoundData = [string, number, Wave]
 type SongData = [Region, [number[], number], number]
 
 const sin = (i: number) => Math.sin(i);
 const saw = (i: number) => ((i % 6.28) - 3.14) / 6.28;
 const sqr = (i: number) => clamp(Math.sin(i) * 1000, -1, 1);
 const noise = () => Math.random()
+
+const cri = (i: number, x: number, y: number) => sqr(i) < 0.5 ? x : y
 
 
 let audioCtx: AudioContext, sampleRate: number
@@ -29,13 +32,11 @@ let sounds: SoundData[] = [
     (i*=-999)&&0.6 * sin(i / (20 + sin(i/900 + sin(i / 440 + sin(i / 222))) - i / 400))],
   ['click', 0.737, (i: number) => 
     (i*=-999)&&0.6 * sin(i / (20 + sin(i/900 + sin(i / 440 + sin(i / 222))) - i / 400))],
-  ['tense', 1.5, (i: number) => 
-    0.1 * (sqr(i/800)*0.5 + 0.5) * saw(i / 110)],
-  ['short', 0.4, (i: number) => 
-    0.03 * saw(i/4)],
-  ['start2', 3.321, (i: number) => 
-    sqr(i / (20 + i / 100)) + noise() / i * 210 - sin(i*33.22)*6],
-  ['sqr', 1.1415, (i: number) => sqr(i / (111 - i / 54.21))],
+  ['open', 0.93, (i: number) => 
+    0.555 * sqr(30*sin(3*i)/(30-3*i)*sin(sqr(i))) + 0.455 * saw(2 / saw(3 * saw(4 / sqr(noise() * 3 * sin(0.2*i) +  6 / sin(i)*0.8))))
+    ],
+  ['nbuzz', 2.321, (i: number) => 
+    ((sqr(i) < 0.3 * sin(i) ? -13 : 10) * saw(sqr(i/10)<0.5?30*i:50*i) + sin(i*30))]
 ]
 
 type FxData = string
