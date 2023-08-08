@@ -271,6 +271,7 @@ class PhWorld extends Play {
   _switch<T extends PhBody>(old: PhBody, ctor: { new (): T }, data: any = {}) {
     let i =  this.bodies.indexOf(old)
     if (i === -1) {
+      progress.track('error')
       throw 'nobody'
     }
     this.bodies.splice(i, 1)
@@ -337,6 +338,7 @@ class Pickable extends PhBodyAnim {
     let { picked } = this
 
     if (picked) {
+      progress.track('pickup')
 
       if (Time.on_interval(0.2)) {
         this.pool(Zzz, { x: this.x, y: this.y - 8 })
@@ -414,6 +416,7 @@ class Player extends PhBodyAnim {
     
     if (this.grounded && (Time.on_interval(brown(3)) || !this._pre_grounded)) {
 
+      progress.track('jump')
       this.pool(BounceP, {
         x: this.x - 8 * this.facing,
         y: this.y - 8
@@ -423,9 +426,11 @@ class Player extends PhBodyAnim {
     this._pre_grounded = this.grounded
 
     if (Input.btn('left')) {
+      progress.track('left')
       this.anim.scale_x = -1
       this.dx = -max_dx
     } else if (Input.btn('right')) {
+      progress.track('right')
       this.anim.scale_x = 1
       this.dx = max_dx
     } else {
@@ -435,6 +440,8 @@ class Player extends PhBodyAnim {
     if (Input.btn('jump')) {
       if (this.grounded) {
         this.dy = -jump_dy
+      } else {
+        progress.track('fly')
       }
     }
 
@@ -632,7 +639,7 @@ class Hud extends Play {
   music_text!: Text
   music_ontext!: Text
 
-  time_text!: Text
+  time_text!: CText
 
   _init() {
 
@@ -698,8 +705,10 @@ class Hud extends Play {
 
   update_sound_text() {
     if (Sound.music_onoff) {
+      progress.track('music on')
       this.music_ontext.text = 'on'
     } else {
+      progress.track('music off')
       this.music_ontext.text = 'off'
     }
   }
@@ -713,6 +722,7 @@ class Hud extends Play {
     this.time_text.text = time_format(progress.time_left)
 
     if (Input.btnp('music')) {
+      progress.track('key m')
       Sound.music_onoff = !Sound.music_onoff
       this.update_sound_text()
     }
@@ -762,6 +772,8 @@ class GamePlayScene extends Scene {
     this.make(Hud, {
       on_credits() {
         self.switch_scene(CreditsScene)
+
+        progress.track('credits link')
       }
     })
   }
@@ -769,6 +781,7 @@ class GamePlayScene extends Scene {
   _update() {
     progress.update()
     if (progress.times_up) {
+      progress.track('game end')
       this.make(GamePlayEndNotification)
       if (this._countdown === 0) {
         this._countdown = 5.432
@@ -779,6 +792,7 @@ class GamePlayScene extends Scene {
       this._countdown-= Time.delta
       if (this._countdown <= 0) {
         this.switch_scene(CreditsScene)
+        progress.track('countdown credits')
       }
     }
   }
@@ -799,8 +813,12 @@ let progress = Progress.make()
 class CreditsScene extends Scene {
 
   texts!: Text[]
+  sub_texts!: Text[]
+  end_message_texts!: Text[]
 
   code_text!: Text
+  end_message_text!: Text
+  info_text!: Text
 
   last_progress!: Progress
 
@@ -815,17 +833,45 @@ class CreditsScene extends Scene {
 
     this.make(Text, { color: Color.lightpurple, x: -1070, y: 1020, size: 9000, text: 'E' })
 
+
+    this.info_text = this.make(Text, { color: Color.darkblue, x: 0, y: 1000, size: 38, text: 'press jump or pickup to pause' })
+
     let x = 1920 / 4
 
+    this.end_message_texts = [ 
+      this.make(Text, { color: Color.white, x, y: 100, size: 40, text: `you\'ve invested "${this.last_progress.time_elapsed}" knucles back to your future.` }),
+      this.make(Text, { color: Color.white, x, y: 100, size: 40, text: `don't ever` }),
+      this.make(Text, { color: Color.white, x, y: 100, size: 40, text: `for any reason` }),
+      this.make(Text, { color: Color.white, x, y: 100, size: 40, text: `no matter what you're doing` }),
+      this.make(Text, { color: Color.white, x, y: 100, size: 40, text: `or where you are` }),
+      this.make(Text, { color: Color.white, x, y: 100, size: 40, text: `or who you've been with` }),
+      this.make(Text, { color: Color.white, x, y: 100, size: 40, text: `for any reason` }),
+      this.make(Text, { color: Color.white, x, y: 100, size: 40, text: `no matter whatsoever` }),
+    ]
+
     this.code_text = 
-      this.make(Text, { color: Color.darkpurple, x, y: 100, size: 40, text: 'please send your secret code wait_x2_not in the end to me ;)' }),
+      this.make(Text, { color: Color.darkpurple, x, y: 100, size: 40, text: 'please send your secret code wait_x2_not in the end to me;' }),
+
+    this.sub_texts = [
+      this.make(Text, { color: Color.red, x, y: 100, size: 70, text: 'watermelon or an exotic pomengrate' }),
+      this.end_message_texts[0],
+      this.make(Text, { color: Color.white, x, y: 100, size: 70, text: 'watermelon or an exotic pomengrate' }),
+      this.end_message_texts[1],
+      this.make(Text, { color: Color.darkblue, x, y: 100, size: 70, text: 'watermelon or an exotic pomengrate' }),
+      this.end_message_texts[2],
+      this.make(Text, { color: Color.darkblue, x, y: 100, size: 70, text: 'watermelon or an exotic pomengrate' }),
+      this.end_message_texts[3],
+      this.make(Text, { color: Color.darkblue, x, y: 100, size: 70, text: 'watermelon or an exotic pomengrate' }),
+      this.end_message_texts[4],
+      this.end_message_texts[5],
+      this.end_message_texts[6],
+    ]
 
     this.texts = [
       this.make(Text, { color: Color.darkpurple, x, y: 100, size: 90, text: 'thanks for playing' }),
 
       this.code_text,
 
-      this.make(Text, { color: Color.darkpurple, x, y: 100, size: 38, text: 'press jump or pickup to pause' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'art twitter.com/_V3X3D' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'music github.com/arikwex' }),
       this.make(Text, { color: Color.darkpurple, x, y: 1000, size: 90, text: 'author twitter.com/eguneys' }),
@@ -838,6 +884,7 @@ class CreditsScene extends Scene {
     this.add_mouse(0, 0, 320, 180, {
       on_click() {
         if (self.life > 2) {
+          progress.track('reset')
           self.switch_scene(StartScene1)
         }
       }
@@ -850,10 +897,30 @@ class CreditsScene extends Scene {
 
     if (Input.btnp('jump') || Input.btnp('pickup')) {
       this._hold = !this._hold
+      if (!this._hold) {
+        this.info_text.color = Color.grey
+        this.info_text.size -= 10
+      }
     }
     if (this._hold) {
+
+      this.info_text.o_x = 7 + Math.cos(this.life * 3) * 10
+      this.info_text.o_y = 3 + Math.sin(this.life * 7) * 10
       return
     }
+    this.info_text.o_x = 0
+    this.info_text.o_y = 0
+
+
+    this.sub_texts[0].y += Time.delta * 180
+    if (this.sub_texts[0].y > this.sub_texts.length * 1080 - 100) {
+      this.code_text.text = this.code_text.text.replace('wait_x2_not', this.last_progress.code)
+    }
+    this.sub_texts[0].y %= this.sub_texts.length * 1080 - 100
+    this.sub_texts.reduce((pre, next) => { 
+      next.y = pre.y - pre.height - 777
+      return next
+    })
 
     this.texts[0].y += Time.delta * 200
     if (this.texts[0].y > this.texts.length * 1080 - 100) {
@@ -874,6 +941,8 @@ class StartScene1 extends Scene {
   begin_text2!: Text
 
   _first_update() {
+    console.log('here')
+    //this.switch_scene(CreditsScene)
     //this.switch_scene(GamePlayScene)
     //this.switch_scene(CreditsScene)
   }
@@ -898,6 +967,7 @@ class StartScene1 extends Scene {
       this.begin_text1.text = text
       this.begin_text2.text = text
       console.log(text)
+      progress.track('sound')
     })
 
     let self = this
@@ -905,6 +975,7 @@ class StartScene1 extends Scene {
       on_click() {
         if (Sound.loaded) {
           self.switch_scene(GamePlayScene)
+          progress.track('load game')
         }
       }
     })
@@ -931,7 +1002,6 @@ export default class Scene1 extends Scene {
 
   _init() {
     this.add_scene(StartScene1)
-    //this.add_scene(GamePlayScene)
   }
 
   _pre_draw(g: Graphics, t: Graphics) {
@@ -1018,6 +1088,8 @@ class Text extends Play {
     return this.size
   }
 
+  o_x!: number
+  o_y!: number
   x!: number
   y!: number
   size!: number
@@ -1030,10 +1102,13 @@ class Text extends Play {
     this.y = this.data.y
     this.size = this.data.size ?? 64
     this.color = this.data.color ?? Color.light
+
+    this.o_x = 0
+    this.o_y = 0
   }
 
   _draw(_: Graphics, t: Graphics) {
-    this._width = t.str(this.text, this.x, this.y, this.size, this.color, this.data.align)
+    this._width = t.str(this.text, this.o_x + this.x, this.o_y + this.y, this.size, this.color, this.data.align)
   }
 }
 

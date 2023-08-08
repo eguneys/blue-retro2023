@@ -13,9 +13,13 @@ export default class Color {
   static  darkblue = Color.hex(0x183452)
   static darkred = Color.hex(0xb42c73)
   static red = Color.hex(0xde505a)
+  static lightred = Color.hex(0xde505a)
   static green = Color.hex(0x20eea4)
   static purple = Color.hex(0x8b81b4)
   static darkpurple = Color.hex(0x735973)
+  static darkgreen = Color.hex(0x00ae8b)
+  static grey = Color.hex(0xcdd2e6)
+  static white = Color.hex(0xeeeaf6)
 
 
 

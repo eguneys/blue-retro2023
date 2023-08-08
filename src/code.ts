@@ -1,5 +1,7 @@
 import Time from './time'
 
+type Experience = string
+
 export class Progress {
 
   static make = () => new Progress()
@@ -17,7 +19,11 @@ export class Progress {
     return 0
   }
 
+  get time_elapsed() {
+    return Math.ceil(this._elapsed)
+  }
 
+  _elapsed = 0
   time_left = 30
   time_begin = false
 
@@ -29,7 +35,18 @@ export class Progress {
     return this.time_left === 0
   }
 
+
+  experience = ['play']
+
+
+  track(experience: Experience) {
+    this.experience.push(experience)
+  }
+
   update() {
+
+    this._elapsed += Time.delta
+
     if (this.time_begin) {
       this.time_left -= Time.delta
       if (this.time_left < 0) {
