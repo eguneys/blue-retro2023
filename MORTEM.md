@@ -36,6 +36,10 @@ I also have been active in Slack group, so check that out too.
 
 I use vite development server, for instant updates and smooth development experience, and vast plugins.
 
+Here's some nice visualization of bundle distribution:
+
+![bundle visualization](bundle_vis.png).
+
 I have a tool called [aset](https://github.com/eguneys/aset), which parses aseprite files, and for packing those into an atlas. I have scripts to watch for file changes and load the art content directly into game, so that's good. It also optimizes the png file to shrink further.
 
 I didn't use roadroller because of [some import.meta bug](https://stackoverflow.com/questions/76765987/cannot-use-import-meta-even-though-type-module-is-enabled-on-github-pages).

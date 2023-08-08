@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "clean": "rimraf dist && rimraf dist.zip && rimraf build-analysis.html",
-    "zip": "cd dist && zip -r ../dist.zip . -9 && cd .. && sh filesize.sh",
+    "zip": "cd dist && zip -r ../dist.zip . -9 && cd .. && advzip --recompress --shrink-extra dist.zip && sh filesize.sh",
     "dist": "pnpm build && pnpm zip",
     "dev": "vite --port=3000",
     "devc": "concurrently \"pnpm content\" \"pnpm dev\"",
@@ -15,6 +15,8 @@
     "preview": "vite build && vite preview --port=3000"
   },
   "devDependencies": {
+    "advpng-bin": "^7.0.0",
+    "advzip-bin": "^2.0.0",
     "aset": "link:..\\aset",
     "chokidar": "^3.5.3",
     "concurrently": "^8.2.0",
