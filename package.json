@@ -21,6 +21,8 @@
     "chokidar": "^3.5.3",
     "concurrently": "^8.2.0",
     "http-server": "^14.1.1",
+    "imagemin": "^8.0.1",
+    "imagemin-advpng": "^6.0.0",
     "jspngopt": "^0.2.0",
     "rimraf": "^5.0.1",
     "roadroller": "^2.1.0",

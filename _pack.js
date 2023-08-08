@@ -1,6 +1,10 @@
 import fs from 'fs'
 import { ImageSave, Rect, Packer, aseprite } from 'aset'
 import jspngopt from 'jspngopt'
+import imagemin from 'imagemin'
+import imageminAdvpng from 'imagemin-advpng'
+
+
 
 export default async function pack() {
 
@@ -41,6 +45,12 @@ export default async function pack() {
   fs.writeFileSync('./content/out_0.png', opt_png)
   fs.writeFileSync('./content/out_0.json', JSON.stringify(res))
   fs.writeFileSync('./content/out_0.con', condensed(res))
+
+
+  await imagemin(['./content/out_0.png'], {
+    plugins: [ imageminAdvpng()]
+  })
+
 
   console.log('content written.')
 
