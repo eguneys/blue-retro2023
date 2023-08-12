@@ -31,11 +31,15 @@ const max_nb = 3
 const small_epsilon = 1e-5
 const epsilon = 1
 const max_dx = 2.58002
-const _G = 4.1812
+const _G = 2.7812
 const max_dy = 1.3 * _G
 const jump_dy = max_dy
 const jump_max_accel_y = 0.044311
 const fall_max_accel_y = 0.877
+const h_max_accel = 1.7
+
+const h_dist = (x: number, y: number) => Math.sqrt(Math.abs(x * x - y * y))
+const fixed = (x: number) => Math.round(x)
 
 abstract class LevelP extends Play {
 
@@ -68,21 +72,6 @@ abstract class LevelP extends Play {
         let ni = (i * 2) / (nb * nb)
 
         {
-
-          let dx = Math.abs(body.dx)
-          let sign = Math.sign(body.dx)
-
-          for (let di = ni; di <= dx; di+= ni) {
-            let dxx = 1/2 * sign * di * Math.sqrt(Time.delta)
-            if (grid.is_solid_xywh(body, dxx, 0)) {
-              body.collide_h = sign
-              body.dx = 0
-              break
-            } else {
-              body.collide_h = 0
-              body.x += dxx
-            }
-          }
         }
 
         let G = _G * body._scale_G
@@ -115,6 +104,8 @@ abstract class LevelP extends Play {
           }
         }
 
+        let h_fall_accel = 0
+
         {
 
           let dy = fall_max_accel_y * G
@@ -129,10 +120,37 @@ abstract class LevelP extends Play {
             } else {
               body.collide_v = 0
               body.y += dyy
+              
+              h_fall_accel = 1
             }
           }
         }
+
+        {
+          let dx = Math.abs(body.dx)
+          let sign = Math.sign(body.dx)
+          let h_accel = Math.pow(2.2 * h_dist(body.dy, 1), -h_dist(body.dy, 1) * 0.18) * 1.8
+
+          for (let di = ni; di <= dx; di += ni) {
+            let dxx = 1 / 2 * sign * di * Math.sqrt(Time.delta) * h_accel
+            if (grid.is_solid_xywh(body, dxx, 0)) {
+              body.collide_h = sign
+              body.dx = 0
+              break
+            } else {
+              body.collide_h = 0
+              body.x += dxx
+            }
+          }
+
+        }
+
       }
+
+
+      {
+      }
+
     })
   }
 
@@ -409,18 +427,33 @@ class Player extends PhBodyAnim {
     return this.anim.scale_x
   }
 
-  _first_update() {
+  _sudden_slow: number
+
+  _init() {
+    this._sudden_slow = 0.5
+  }
+
+  dusty(off_x: number) {
+    this.pool(BounceP, {
+      x: this.x - 8 * this.facing + off_x,
+      y: this.y - 8
+    }, 4)
   }
 
   _update() {
     
-    if (this.grounded && (Time.on_interval(brown(3)) || !this._pre_grounded)) {
-
+    if (this.grounded && !this._pre_grounded) {
       progress.track('jump')
-      this.pool(BounceP, {
-        x: this.x - 8 * this.facing,
-        y: this.y - 8
-      }, 4)
+
+      this.dusty(0)
+      this.sched(0.1, () => this.grounded && this.dusty(-9))
+      this.sched(0.1, () => this.grounded && this.dusty(+9))
+      this.sched(0.2, () => this.grounded && this.dusty(-19))
+      this.sched(0.2, () => this.grounded && this.dusty(+19))
+    }
+
+    if (Time.on_interval(brown(3))) {
+
     }
 
     this._pre_grounded = this.grounded
@@ -456,8 +489,15 @@ class Player extends PhBodyAnim {
           Sound.fx('open')
           this._pickup.picked = this
           progress.time_begin = true
+          this._sudden_slow = 0.6
         }
       }
+    }
+
+    if (this._sudden_slow > 0) {
+      this._sudden_slow -= Time.delta
+      if (this._sudden_slow < 0) { this._sudden_slow = 0 }
+      this.dx *= Math.pow(2, -h_dist(this._sudden_slow, 0.5))
     }
   }
 

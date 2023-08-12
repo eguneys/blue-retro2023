@@ -29,17 +29,23 @@ export default abstract class Play {
 
   _mouses: Map<RectKey, MouseHandler>
 
+  _scheds: [number, () => void][]
+
   add_mouse(x: number, y: number, w: number, h: number, handler: MouseHooks) {
     let key = rect2key(x, y, w, h)
     this._mouses.set(key, { ...handler, _hovering: false })
   }
 
+  sched(n: number, p: () => void) {
+    this._scheds.push([n, p])
+  }
 
 
   constructor() {
     this.pools = []
     this.objects = []
     this._mouses = new Map()
+    this._scheds = []
   }
 
   _make<T extends Play>(ctor: { new (): T }, data: any) {
@@ -89,6 +95,13 @@ export default abstract class Play {
     }
     this.objects.forEach(_ => _.update())
     this.life += Time.delta
+
+    this._scheds = this._scheds.map<[number, () => void]>(([n, p]) => {
+      if (n - Time.delta < 0) {
+        p()
+      }
+      return [n - Time.delta, p]
+    }).filter(_ => _[0] > 0)
 
     this.pools.slice(0).forEach(([o, l]) => {
       let ls = this.pools.filter(_ => _[0].constructor.name === o.constructor.name)
