@@ -427,7 +427,7 @@ class Player extends PhBodyAnim {
     return this.anim.scale_x
   }
 
-  _sudden_slow: number
+  _sudden_slow!: number
 
   _init() {
     this._sudden_slow = 0.5
