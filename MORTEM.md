@@ -20,7 +20,7 @@ I will confess, I have lots of free time and nothing else to do, so I started ri
 
 ChatGPT has been my biggest supporter, I put some interesting links in this repo's README, so please check them out.
 
-I also have a discord where I share pixel art and game dev topics that I find interesting, [here](https://discord.gg/6CnntAz9).
+I also have a discord where I share pixel art and game dev topics that I find interesting, [here](https://discord.gg/rC6HQ7Nb).
 
 So art belongs to [this guy](https://twitter.com/_V3X3D/status/1683813077022658562?s=20), thanks to him.
 
