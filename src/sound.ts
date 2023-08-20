@@ -35,8 +35,8 @@ let sounds: SoundData[] = [
   ['open', 0.93, (i: number) => 
     0.555 * sqr(30*sin(3*i)/(30-3*i)*sin(sqr(i))) + 0.455 * saw(2 / saw(3 * saw(4 / sqr(noise() * 3 * sin(0.2*i) +  6 / sin(i)*0.8))))
     ],
-  ['nbuzz', 2.321, (i: number) => 
-    ((sqr(i) < 0.3 * sin(i) ? -13 : 10) * saw(sqr(i/10)<0.5?30*i:50*i) + sin(i*30))]
+  //['nbuzz', 2.321, (i: number) => 
+  //  ((sqr(i) < 0.3 * sin(i) ? -13 : 10) * saw(sqr(i/10)<0.5?30*i:50*i) + sin(i*30))]
 ]
 
 type FxData = string

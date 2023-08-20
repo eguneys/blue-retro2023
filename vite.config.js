@@ -17,6 +17,10 @@ let colors = [
   'lightpurple'
 ]
 
+
+
+let reserved = [...['experience', '_scheds', '_elapsed', 'from_code', 'cluster', 'make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline', 'seconds', 'hex', 'css', 'h', 'lerp', '_music_onoff', 'time_left'], ...colors]
+
 export default defineConfig({
   base: './',
   plugins: [glsl(), viteImagemin({
@@ -28,9 +32,9 @@ export default defineConfig({
       mangle: {
         module: true,
         properties: {
-          debug: true,
+          //debug: true,
           keep_quoted: 'strict',
-          reserved: [...['experience', '_scheds', '_elapsed', 'from_code', 'cluster', 'make', 'current_frame', '_current_frame', 'ticks_per_second', '__elapsed', 'hline', 'vline', 'seconds', 'hex', 'css', 'h', 'lerp', '_music_onoff', 'time_left'], ...colors]
+          reserved
         }
       }
     },
