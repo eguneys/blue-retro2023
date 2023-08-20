@@ -21,7 +21,7 @@ function decon(con: string) {
     })
 
     let packs = _packs.split('\n').map(_ => {
-      let [fx, fy, fw, fh, sx, sy, sw, sh] = _.split('*').map(_ => parseInt(_))
+      let [fx, fy, fw, fh, sx, sy, sw, sh] = mega_expand(_.split('*').map(_ => parseInt(_)))
       return { fx, fy, fw, fh, sx, sy, sw, sh, duration: 100 }
     })
 
@@ -31,6 +31,22 @@ function decon(con: string) {
       packs
     }
   })
+}
+
+function mega_expand(v: number[]) {
+  let [wh, px, py] = v
+
+  let x = 0,
+    y = 0,
+    [w, h] = (wh === 0 ? [16, 16] :
+              (wh === 1 ? [32,16] :
+               (wh === 2 ? [80,80] :
+                [0, 0])))
+
+  let [pw, ph] = [w, h]
+
+
+  return [x, y, w, h, px, py, pw, ph]
 }
 
 type ContentTag = {

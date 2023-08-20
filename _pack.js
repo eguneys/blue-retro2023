@@ -74,10 +74,26 @@ function condensed(json) {
       frame: { x, y, w, h },
       packed: { x: px, y: py, w: pw, h: ph },
       meta: { duration }
-    }) => [x,y,w,h,px,py,pw,ph].join('*')).join('\n')
+    }) => mega_shrink([x,y,w,h,px,py,pw,ph]).join('*')).join('\n')
 
     return [name, tt, pp].join('\n\n')
   }).join('\n\n\n')
+}
+
+// src/content.ts -> mega_extend
+function mega_shrink(v) {
+  let [x,y,w,h,px,py,pw,ph] = v
+
+  // assume
+  // x,y = 0
+  // w,h = 16,16 | 32,16 | 80,80
+  // pw,ph = w,h
+  // px,py = px,py
+
+  let code_wh = (w === 16 ? 0 : 
+    (w === 32 ? 1 :
+    (w === 80 ? 2 : 3)))
+  return [code_wh,px,py]
 }
 
 
