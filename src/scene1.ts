@@ -391,7 +391,46 @@ class Zzz extends PhBody {
   }
 }
 
-class Fly extends Pickable {
+type DistanceGoalData = AnimData & PhBodyData & {
+  goal_x: number
+  goal_y: number
+}
+class DistanceGoalPickup extends Pickable {
+
+  get data() {
+    return this._data as DistanceGoalData
+  }
+
+  d!: number
+
+  d_bar!: RectPlay
+
+  init() {
+
+    this.d = 0
+
+    let w = 100
+    let h = 8
+    this.d_bar = this.make(RectPlay, { color: Color.darkred, x: 3, y: 2, w, h })
+
+    return super.init()
+  }
+
+  update() {
+
+    let { x, y } = this
+    let { goal_x, goal_y } = this.data
+
+    this.d = Math.floor(distance(goal_x, goal_y, x, y))
+
+    this.d_bar.data.x = l2h_x(x)
+    this.d_bar.data.y = l2h_y(y - 24)
+
+    super.update()
+  }
+}
+
+class Fly extends DistanceGoalPickup {
 
   _update() {
 
@@ -416,12 +455,40 @@ class Fly extends Pickable {
 }
 
 class Dust extends PhBodyAnim {}
-class Ghoul extends Pickable {}
+class Ghoul extends DistanceGoalPickup {}
+
+class PickupLine extends Play {
+
+  x!: number
+  y!: number
+  x2!: number
+  y2!: number
+
+  _draw(g: Graphics) {
+    let { x, y, x2, y2 } = this
+    g.line(Color.light, x, y, x2, y2)
+  }
+}
+
+function ps_on_line(x: number, y: number, x2: number, y2: number) {
+  return [...Array(10).keys()].map(i => {
+    let t = i / 10
+    let X = x + t * (x2 - x)
+    let Y = y + t * (y2 - y)
+
+    return [X, Y]
+  })
+}
 
 class Player extends PhBodyAnim {
 
+  _prepickup?: Pickable
   _pickup?: Pickable
   _pre_grounded = false
+
+  pickup_line!: PickupLine
+
+  message!: string
 
   get facing() {
     return this.anim.scale_x
@@ -431,6 +498,10 @@ class Player extends PhBodyAnim {
 
   _init() {
     this._sudden_slow = 0.5
+
+    this.pickup_line = this.make(PickupLine);
+
+    this.message = progress.next_message
   }
 
   dusty(off_x: number) {
@@ -453,7 +524,7 @@ class Player extends PhBodyAnim {
     }
 
     if (Time.on_interval(brown(3))) {
-
+      this.message = progress.next_message
     }
 
     this._pre_grounded = this.grounded
@@ -478,13 +549,43 @@ class Player extends PhBodyAnim {
       }
     }
 
+    if (Time.on_interval(brown(1))) {
+      if (!this._pickup) {
+        this._prepickup = this.find_pickup(Ghoul) || this.find_pickup(Fly) 
+      }
+    }
+
+    if (this._prepickup) {
+      this.pickup_line.x = this.x
+      this.pickup_line.y = this.y
+      this.pickup_line.x2 = this._prepickup.x
+      this.pickup_line.y2 = this._prepickup.y
+    } else {
+      this.pickup_line.x = -100
+      this.pickup_line.y = -100
+      this.pickup_line.x2 = -10
+      this.pickup_line.y2 = -10
+    }
+
+
+    if (this._prepickup) {
+      if (Time.on_interval(0.2 + brown(0.2))) {
+        ps_on_line(this.x, this.y, this._prepickup.x, this._prepickup.y)
+        .slice(0, brown(10))
+        .forEach(([x, y]) => {
+          this.pool(Text, { color: Color.darkgreen,  x: l2h_x(x), y: l2h_y(y), size: brown(8) * 24 + brown(4) * brown(56), text: this.message[ubrown(this.message.length)], align: 'c' })
+        })
+      }
+    }
+
 
     if (Input.btnp('pickup')) {
       if (this._pickup) {
         this._pickup.picked = undefined
         this._pickup = undefined
+        this._prepickup = undefined
       } else {
-        this._pickup = this.find_pickup(Fly) || this.find_pickup(Ghoul)
+        this._pickup = this._prepickup;
         if (this._pickup) {
           Sound.fx('open')
           this._pickup.picked = this
@@ -508,7 +609,7 @@ class Player extends PhBodyAnim {
     .map<[Pickable, number]>(_ => [_ as Pickable, distance(_.x, _.y, x, y)])
     .sort((a, b) => a[1] - b[1])[0]
 
-    if (res && res[1] < 10) {
+    if (res && res[1] < 32) {
       return res[0]
     }
 
@@ -1194,6 +1295,8 @@ class AutoGenDecoration extends Play {
 function gen_pickup() {
   return arr_rnd([
     [Fly, {
+      goal_x: 0,
+      goal_y : 0,
       name: `fly`,
       x: 60 + ubrown(190),
       y: 30 + ubrown(60),
@@ -1202,6 +1305,8 @@ function gen_pickup() {
       scale_G: 0.03 + ibrown(0.3),
       s_origin: 'bc'
     }], [Ghoul, {
+      goal_x: 320,
+      goal_y: 180,
       name: `ghoul`,
       x: ubrown(320),
       y: 130,
@@ -1241,13 +1346,13 @@ class AutoGenPickups extends Play {
       let [ctor, data]: any = gen_pickup()
 
       if (this.ones.length < 2 || this.ones.length < ubrown(2 + ubrown(6))) {
-        this.ones.push(this.world.body(ctor, data))
+        this.ones.push(this.world.body(ctor, {...data }))
       } else {
         let o = this.ones.shift()!
         if (o) {
           if (o.picked) {
           } else {
-            this.ones.push(o.switch(ctor, data)!)
+            this.ones.push(o.switch(ctor, { ...data })!)
           }
         }
       }

@@ -53,6 +53,16 @@ export default class Graphics {
     ctx.restore()
   }
 
+  line(color = Color.red, x: number, y: number, x2: number, y2: number) {
+    let { ctx } = this
+    ctx.fillStyle = color.css
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(Math.floor(x), Math.floor(y))
+    ctx.lineTo(Math.floor(x2), Math.floor(y2))
+    ctx.stroke()
+  }
+
   rect(color = Color.red, x: number, y: number, w: number, h: number) {
     let { ctx } = this
     ctx.fillStyle = color.css

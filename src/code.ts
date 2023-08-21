@@ -11,6 +11,19 @@ export class Progress {
     return res
   }
 
+  get next_message() {
+
+    if (this._elapsed < 15) {
+      return 'iMi<3^:p^<3iMi'
+    }
+
+    if (!this.experience.includes('pickup')) {
+      return '"x" to pickup'
+    }
+
+    return 'joy\'s are us'
+  }
+
   get code() {
     return 'hello'
   }
@@ -24,7 +37,7 @@ export class Progress {
   }
 
   _elapsed = 0
-  time_left = 30
+  time_left = 120 
   time_begin = false
 
   get last_ten() {
