@@ -37,6 +37,7 @@ aseprite files go into `assets/sprites` folder. `out_0.png` files built into `as
 
 
 ## Interesting ChatGPT Conversations
+- [zero to music production timeline](https://chat.openai.com/share/f3586b60-4cf9-41ff-9558-16450f441300)
 - [jokes and silence](https://chat.openai.com/share/98466d46-7fae-4478-9bae-5383720790e4)
 - [satisfactory](https://chat.openai.com/share/08945156-4feb-4c3e-ae9c-fb66ef9e89f8)
 - [game theme chaos and order](https://chat.openai.com/share/9cef6b75-dfcd-4ff3-9b3f-b3f7bbc8c0db)
